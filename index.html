@@ -2,217 +2,247 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ino.digital | HD Ultra Boost</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; position: fixed; overscroll-behavior-y: none; }
-
+        html, body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; position: fixed; }
+        
         .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding-bottom: 140px; }
         .app-card { text-align: center; width: 90%; max-width: 320px; }
-        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #bc13fe; box-shadow: 0 0 20px #bc13fe; margin-bottom: 15px; cursor: pointer; }
-        h2 { font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 1.3rem; }
-        .tag { color: #444; font-size: 10px; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase; }
+        
+        /* LOGO & UI STATES */
+        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #222; box-shadow: 0 0 10px #111; margin-bottom: 15px; cursor: pointer; transition: 0.3s; }
+        .logo-img.online { border-color: #bc13fe; box-shadow: 0 0 20px #bc13fe; }
+        h2 { font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 1.3rem; color: #333; transition: 0.3s; }
+        h2.online { color: #fff; }
+        .tag { color: #222; font-size: 10px; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase; transition: 0.3s; }
+        .tag.online { color: #444; }
 
-        /* UPLOAD & PROGRESS */
-        .upload-box { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; position: relative; }
-        .btn-up { background: #bc13fe; color: #fff; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 900; margin-top: 10px; cursor: pointer; transition: 0.3s; }
-        .btn-up:disabled { background: #222 !important; color: #555; cursor: not-allowed; }
-        .btn-dl-final { background: #bc13fe !important; box-shadow: 0 0 20px rgba(188, 19, 254, 0.6); animation: pulse 2s infinite; }
+        /* BUTTONS */
+        .upload-box { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; }
+        .btn-up { background: #111; color: #444; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 900; margin-top: 10px; cursor: not-allowed; text-transform: uppercase; transition: 0.4s; font-size: 11px; }
+        .btn-up.active-btn { background: #bc13fe !important; color: #fff !important; cursor: pointer !important; box-shadow: 0 0 15px rgba(188,19,254,0.4); }
+        .btn-pilih { background: #0a0a0a; border: 1px dashed #222; color: #444; cursor: pointer; margin-bottom: 5px; }
+        .btn-pilih.online { border-color: #333; color: #fff; }
 
+        /* PROGRESS */
         #prog-cont { width: 100%; height: 6px; background: #111; border-radius: 10px; margin-top: 15px; display: none; overflow: hidden; }
-        #prog-bar { width: 0%; height: 100%; background: #bc13fe; box-shadow: 0 0 10px #bc13fe; transition: 0.3s; }
-        #prog-txt { font-size: 10px; color: #bc13fe; font-weight: 700; margin-top: 8px; display: none; }
+        #prog-bar { width: 0%; height: 100%; background: #bc13fe; transition: 0.3s; }
+        #prog-txt { font-size: 9px; color: #bc13fe; font-weight: 700; margin-top: 8px; display: none; text-transform: uppercase; text-align: center; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        /* ADMIN POPUP */
+        #adminPopup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .pop-card { background: #111; border: 2px solid #bc13fe; padding: 25px; border-radius: 20px; width: 280px; text-align: center; }
+        .pop-card input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
+        .btn-pop { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; margin-top: 5px; text-transform: uppercase; }
 
-        /* FOOTER */
-        footer { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0; background: #000; text-align: center; border-top: 1px solid #111; z-index: 100; }
-        .copy-neon { color: #bc13fe; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        .footer-links { display: flex; justify-content: center; gap: 20px; }
-        .legal-link { color: #444; font-size: 9px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
-
-        /* SUPPORT */
-        .btn-cs { position: fixed; bottom: 90px; right: 20px; background: #bc13fe; color: #fff; padding: 10px 18px; border-radius: 50px; font-weight: 900; font-size: 10px; z-index: 50; }
-        #notif-dot { position: absolute; top: -5px; right: 0; width: 12px; height: 12px; background: red; border-radius: 50%; border: 2px solid #000; display: none; }
-
-        /* CHAT DRAWER */
-        #ov { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1000; }
-        #dw { position: fixed; bottom: 0; left: 0; width: 100%; height: 85vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 1001; transform: translateY(100%); transition: 0.3s; display: flex; flex-direction: column; }
-        #dw.active { transform: translateY(45vh); } #dw.full { transform: translateY(0); }
-        .handle { width: 100%; height: 35px; display: flex; justify-content: center; align-items: center; }
-        .line { width: 35px; height: 4px; background: #333; border-radius: 10px; }
-        .logs { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 15px; font-size: 12px; max-width: 80%; }
+        /* CHAT SUPPORT */
+        .btn-cs { position: fixed; bottom: 90px; right: 20px; background: #111; color: #333; padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 10px; z-index: 50; transition: 0.3s; }
+        .btn-cs.online { background: #bc13fe; color: #fff; box-shadow: 0 0 15px rgba(188,19,254,0.4); cursor: pointer; }
+        #ov { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1000; }
+        #dw { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 1001; transform: translateY(100%); transition: 0.4s; display: flex; flex-direction: column; }
+        #dw.active { transform: translateY(0); }
+        .logs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 10px 15px; border-radius: 15px; font-size: 12px; max-width: 85%; line-height: 1.4; }
         .m-u { align-self: flex-end; background: #bc13fe; color: #fff; border-bottom-right-radius: 2px; }
         .m-a { align-self: flex-start; background: #1a1a1a; color: #ccc; border: 1px solid #333; border-bottom-left-radius: 2px; }
-        .in-area { padding: 10px 15px 30px 15px; background: #080808; }
-        .in-box { display: flex; align-items: center; background: #111; padding: 10px 15px; border-radius: 25px; border: 1px solid #bc13fe; }
-        #msgIn { flex: 1; background: transparent; border: none; color: #fff; outline: none; font-size: 16px; }
+        .in-area { padding: 15px 15px 35px 15px; background: #080808; }
+        .in-box { display: flex; align-items: center; background: #111; padding: 5px 15px; border-radius: 30px; border: 1px solid #333; }
+        #msgIn { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
+
+        footer { position: fixed; bottom: 0; width: 100%; padding: 20px; background: #000; text-align: center; border-top: 1px solid #111; }
+        .copy-neon { color: #222; font-size: 9px; font-weight: 900; transition: 0.3s; letter-spacing: 2px; }
+        .copy-neon.online { color: #bc13fe; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="app-card">
-            <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="adm">
-            <h2>INO.DIGITAL <span style="color:#bc13fe">HD</span></h2>
-            <div class="tag">AI Photo Restorer</div>
+            <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="secretLogo">
+            <h2 id="mainTitle">INO.DIGITAL <span style="color:#222" id="hdSpan">HD</span></h2>
+            <div class="tag" id="tagline">AI Photo Restorer</div>
             
             <div class="upload-box">
-                <input type="file" id="f" accept="image/*">
-                <button id="mainBtn" class="btn-up" onclick="prosesHD()">MULAI PROSES HD</button>
+                <input type="file" id="f" accept="image/*" style="display:none">
+                <button class="btn-up btn-pilih" id="pilihBtn" onclick="document.getElementById('f').click()">
+                    <i class="fas fa-image"></i> PILIH FOTO
+                </button>
+                <button id="mainBtn" class="btn-up" onclick="prosesHD()" disabled>SERVER OFFLINE</button>
+                
                 <div id="prog-cont"><div id="prog-bar"></div></div>
-                <div id="prog-txt">PROSES: 0%</div>
+                <div id="prog-txt">SEDANG MEMPROSES...</div>
+                
                 <a id="dlBtn" style="display:none; text-decoration:none;" download>
-                    <button class="btn-up btn-dl-final">SIMPAN HASIL KE GALERI</button>
+                    <button class="btn-up active-btn" style="background:#00ff88 !important; color:#000 !important;">SIMPAN KE GALERI</button>
                 </a>
             </div>
         </div>
     </div>
 
-    <footer>
-        <div class="copy-neon">© 2026 INO.DIGITAL HD</div>
-        <div class="footer-links">
-            <span class="legal-link" onclick="alert('PRIVACY POLICY:\nFoto dihapus otomatis dalam 24 jam.')">Privacy Policy</span>
-            <span class="legal-link" onclick="alert('USAGE PROTOCOL:\nCooldown 30 detik antar proses.')">Usage Protocol</span>
+    <div id="adminPopup">
+        <div class="pop-card">
+            <h3 id="popTitle" style="color:#bc13fe; font-size:12px; margin-bottom:15px">ADMIN LOGIN</h3>
+            <div id="stepPassword">
+                <input type="password" id="adminPass" placeholder="Password Admin">
+                <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="verifikasiPass()">NEXT</button>
+                <button class="btn-pop" style="background:transparent; color:#555" onclick="tutupAdmin()">BATAL</button>
+            </div>
+            <div id="stepLink" style="display:none">
+                <input type="text" id="adminLink" placeholder="https://link.lhr.life">
+                <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="simpanLink()">AKTIFKAN</button>
+            </div>
         </div>
-    </footer>
-
-    <div class="btn-cs" onclick="openD()">
-        <i class="fas fa-comment-dots"></i> SUPPORT
-        <div id="notif-dot"></div>
     </div>
 
+    <div class="btn-cs" id="csBtn" onclick="openD()"><i class="fas fa-comment-dots"></i> SUPPORT</div>
     <div id="ov" onclick="closeD()"></div>
     <div id="dw">
-        <div class="handle" id="hdl"><div class="line"></div></div>
+        <div style="padding:15px; border-bottom:1px solid #111; text-align:center; color:#bc13fe; font-weight:900; font-size:10px">INO SUPPORT REALTIME</div>
         <div class="logs" id="lgs"></div>
-        <div class="in-area"><div class="in-box"><input type="text" id="msgIn" placeholder="Tulis pesan..." onfocus="goFull()"><button onclick="send()" style="background:none; border:none; color:#bc13fe;"><i class="fas fa-paper-plane"></i></button></div></div>
+        <div class="in-area">
+            <div class="in-box">
+                <input type="text" id="msgIn" placeholder="Tulis kendala...">
+                <button id="sendBtn" onclick="send()" style="background:none; border:none; color:#bc13fe;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
 
+    <footer><div class="copy-neon" id="footerNeon">© 2026 INO.DIGITAL HD</div></footer>
+
     <script>
-        const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c"; 
-        const ADMIN_ID = "8379816457"; 
+        const PASS_ADMIN = "ino.digital";
+        const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c";
+        const ADMIN_ID = "8379816457";
+        
+        let MASTER_URL = localStorage.getItem('master_link') || "";
+        let myID = localStorage.getItem('ino_userid') || "ID-" + Math.floor(1000+Math.random()*9000);
+        localStorage.setItem('ino_userid', myID);
 
-        const mainBtn = document.getElementById('mainBtn');
-        const dlBtn = document.getElementById('dlBtn');
-        const pCont = document.getElementById('prog-cont');
-        const pBar = document.getElementById('prog-bar');
-        const pTxt = document.getElementById('prog-txt');
-        const fIn = document.getElementById('f');
+        let canChat = true;
 
-        let myUserID = localStorage.getItem('my_web_id') || "USER-" + Math.floor(Math.random() * 90000);
-        localStorage.setItem('my_web_id', myUserID);
+        function updateUI(isOnline) {
+            const el = {
+                btn: document.getElementById('mainBtn'),
+                logo: document.getElementById('secretLogo'),
+                hd: document.getElementById('hdSpan'),
+                title: document.getElementById('mainTitle'),
+                footer: document.getElementById('footerNeon'),
+                cs: document.getElementById('csBtn'),
+                pilih: document.getElementById('pilihBtn'),
+                tag: document.getElementById('tagline')
+            };
 
-        function cekServer() {
-            let cf = localStorage.getItem('cf_link');
-            if(!cf) {
-                mainBtn.innerText = "SERVER ERROR (OFFLINE)";
-                mainBtn.style.background = "#ff0000"; 
-                mainBtn.disabled = true;
+            if(isOnline) {
+                el.btn.innerText = "MULAI PROSES HD"; el.btn.classList.add('active-btn'); el.btn.disabled = false;
+                el.logo.classList.add('online'); el.title.classList.add('online'); el.hd.style.color = "#bc13fe";
+                el.footer.classList.add('online'); el.cs.classList.add('online'); el.pilih.classList.add('online');
+                el.tag.classList.add('online');
             } else {
-                mainBtn.innerText = "MULAI PROSES HD";
-                mainBtn.style.background = "#bc13fe";
-                mainBtn.disabled = false;
+                el.btn.innerText = "SERVER OFFLINE"; el.btn.classList.remove('active-btn'); el.btn.disabled = true;
+                el.logo.classList.remove('online'); el.title.classList.remove('online'); el.hd.style.color = "#222";
+                el.footer.classList.remove('online'); el.cs.classList.remove('online'); el.pilih.classList.remove('online');
+                el.tag.classList.remove('online');
             }
+        }
+
+        async function cekServer() {
+            if(!MASTER_URL) return updateUI(false);
+            try {
+                const res = await fetch(`${MASTER_URL}/`, { priority: 'high' });
+                updateUI(res.ok);
+            } catch(e) { updateUI(false); }
         }
         cekServer();
 
+        // ADMIN PANEL
+        let clicks = 0;
+        document.getElementById('secretLogo').onclick = () => {
+            clicks++;
+            if(clicks >= 10) { document.getElementById('adminPopup').style.display='flex'; clicks=0; }
+            setTimeout(()=>clicks=0, 3000);
+        };
+        function verifikasiPass() {
+            if(document.getElementById('adminPass').value === PASS_ADMIN) {
+                document.getElementById('stepPassword').style.display='none';
+                document.getElementById('stepLink').style.display='block';
+                document.getElementById('adminLink').value = MASTER_URL;
+            } else { alert("Password Salah Bos!"); }
+        }
+        function simpanLink() {
+            let l = document.getElementById('adminLink').value.trim();
+            if(!l.startsWith("https://") || !l.includes(".")) return alert("Link Invalid! Wajib lengkap.");
+            localStorage.setItem('master_link', l); location.reload();
+        }
+        function tutupAdmin() { document.getElementById('adminPopup').style.display='none'; document.getElementById('adminPass').value=""; }
+
+        // PROCESS HD + COOLDOWN 30S
         async function prosesHD() {
-            let cf = localStorage.getItem('cf_link');
-            if(!cf || !fIn.files[0]) return alert("Pilih foto dulu bos!");
+            const f = document.getElementById('f'); if(!f.files[0]) return alert("Pilih foto dulu bos!");
+            const b = document.getElementById('mainBtn');
+            b.disabled = true; b.classList.remove('active-btn'); b.innerText = "MENGIRIM...";
+            document.getElementById('prog-cont').style.display='block';
+            document.getElementById('prog-txt').style.display='block';
 
-            mainBtn.disabled = true;
-            pCont.style.display = "block";
-            pTxt.style.display = "block";
-
-            let p = 0;
-            let sim = setInterval(() => {
-                if(p < 90) {
-                    p += 5;
-                    pBar.style.width = p + "%";
-                    pTxt.innerText = "MENGIRIM: " + p + "%";
-                }
-            }, 300);
-
-            const fd = new FormData();
-            fd.append('file', fIn.files[0]);
-
+            const fd = new FormData(); fd.append('file', f.files[0]);
             try {
-                const res = await fetch(`${cf}/upload`, { method: 'POST', body: fd });
+                const res = await fetch(`${MASTER_URL}/upload`, {method:'POST', body:fd});
                 const data = await res.json();
-                clearInterval(sim);
-                pBar.style.width = "100%";
-                pTxt.innerText = "MENUNGGU HASIL AI...";
-
-                const check = setInterval(async () => {
-                    const resCek = await fetch(`${cf}/check-hd/${data.filename}`);
-                    if(resCek.ok) {
-                        clearInterval(check);
-                        showDownload(`${cf}/static/uploads/HD_${data.filename}`);
+                document.getElementById('prog-bar').style.width="100%";
+                const c = setInterval(async () => {
+                    const r = await fetch(`${MASTER_URL}/check-hd/${data.filename}`);
+                    if(r.ok) { 
+                        clearInterval(c);
+                        document.getElementById('prog-cont').style.display='none';
+                        b.style.display='none';
+                        const d = document.getElementById('dlBtn');
+                        d.style.display='block'; d.href=`${MASTER_URL}/static/uploads/HD_${data.filename}`;
+                        
+                        // START COOLDOWN 30S
+                        let s = 30;
+                        const t = setInterval(() => {
+                            s--; if(s <= 0) { clearInterval(t); location.reload(); }
+                        }, 1000);
                     }
-                }, 4000);
-            } catch (e) {
-                alert("Gagal konek server!");
-                cekServer();
-            }
+                }, 5000);
+            } catch(e) { alert("Error!"); location.reload(); }
         }
 
-        function showDownload(url) {
-            pCont.style.display = "none";
-            pTxt.style.display = "none";
-            mainBtn.style.display = "none";
-            dlBtn.style.display = "block";
-            dlBtn.href = url;
-            setTimeout(() => { dlBtn.style.display = "none"; mainBtn.style.display = "block"; cekServer(); }, 30000);
+        // REAL-TIME CHAT
+        let chatH = JSON.parse(localStorage.getItem('chat_ino')) || [];
+        function renderChat() {
+            const l = document.getElementById('lgs');
+            l.innerHTML = chatH.map(m => `<div class="msg ${m.type==='u'?'m-u':'m-a'}">${m.type==='a'?'<b>ADMIN:</b><br>':''}${m.txt}</div>`).join('');
+            l.scrollTop = l.scrollHeight;
         }
-
-        // --- CHAT SYSTEM ---
-        const dw = document.getElementById('dw');
-        const ov = document.getElementById('ov');
-        const inp = document.getElementById('msgIn');
-        const lgs = document.getElementById('lgs');
-        const nDot = document.getElementById('notif-dot');
-        let lastId = localStorage.getItem('last_id') || 0;
-        let chatH = JSON.parse(localStorage.getItem('chat_h')) || [{ side: 'admin', text: 'Ada kendala? Chat di sini.' }];
-
-        function loadH() {
-            lgs.innerHTML = "";
-            chatH.forEach(m => { lgs.innerHTML += `<div class="msg ${m.side==='user'?'m-u':'m-a'}">${m.text}</div>`; });
-            lgs.scrollTop = lgs.scrollHeight;
-        }
-        loadH();
-
-        function openD() { dw.classList.add('active'); ov.style.display='block'; nDot.style.display='none'; setTimeout(()=>lgs.scrollTop=lgs.scrollHeight,300); }
-        function closeD() { dw.className=''; ov.style.display='none'; }
-        function goFull() { dw.classList.remove('active'); dw.classList.add('full'); setTimeout(()=>lgs.scrollTop=lgs.scrollHeight,300); }
 
         async function send() {
-            let t = inp.value.trim(); if(!t) return;
-            chatH.push({side:'user', text:t}); loadH(); inp.value="";
-            localStorage.setItem('chat_h', JSON.stringify(chatH));
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            if(!canChat) return alert("Sabar bos, jangan spam!");
+            const i = document.getElementById('msgIn'); if(!i.value) return;
+            const val = i.value; chatH.push({type:'u', txt: val}); renderChat(); i.value = "";
+            canChat = false; document.getElementById('sendBtn').style.opacity = "0.3";
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({chat_id:ADMIN_ID, text:`🆔 *${myUserID}*\n💬: ${t}`, parse_mode:"Markdown"})
+                body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${myID}\n💬 ${val}\n\n(Balas pesan ini untuk reply)`})
             });
+            setTimeout(() => { canChat = true; document.getElementById('sendBtn').style.opacity = "1"; }, 3000);
+            localStorage.setItem('chat_ino', JSON.stringify(chatH));
         }
 
         setInterval(async () => {
             try {
-                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${Number(lastId)+1}&timeout=30`);
+                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
                 const d = await r.json();
-                if(d.result.length > 0) {
-                    d.result.forEach(i => {
-                        lastId = i.update_id; localStorage.setItem('last_id', lastId);
-                        if(i.message && i.message.chat.id.toString() === ADMIN_ID) {
-                            if(i.message.reply_to_message && i.message.reply_to_message.text.includes(myUserID)) {
-                                chatH.push({side:'admin', text:i.message.text});
-                                localStorage.setItem('chat_h', JSON.stringify(chatH));
-                                loadH();
-                                if(!dw.classList.contains('active')) nDot.style.display='block';
+                if(d.ok) {
+                    d.result.forEach(u => {
+                        if(u.message && u.message.reply_to_message && u.message.reply_to_message.text.includes(myID)) {
+                            const txt = u.message.text;
+                            if(!chatH.find(m => m.txt === txt && m.type === 'a')) {
+                                chatH.push({type:'a', txt: txt}); renderChat();
+                                localStorage.setItem('chat_ino', JSON.stringify(chatH));
                             }
                         }
                     });
@@ -220,34 +250,9 @@
             } catch(e){}
         }, 3000);
 
-        // ADMIN HIDDEN TRIGGER
-        let clicks = 0;
-        document.getElementById('adm').onclick = () => {
-            clicks++;
-            if(clicks >= 5) {
-                let link = prompt("Admin Tunnel URL:");
-                if(link) {
-                    if(link.endsWith('/')) link = link.slice(0, -1);
-                    localStorage.setItem('cf_link', link);
-                    location.reload();
-                }
-                clicks = 0;
-            }
-            setTimeout(() => clicks = 0, 2000);
-        }
-
-        // SLIDE LOGIC
-        let sY;
-        document.getElementById('hdl').addEventListener('touchstart', e => { sY = e.touches[0].clientY; }, {passive: true});
-        document.getElementById('hdl').addEventListener('touchmove', e => {
-            let mY = e.touches[0].clientY;
-            if (sY - mY > 50) goFull();
-            if (mY - sY > 50) {
-                if(dw.classList.contains('full')) { dw.classList.remove('full'); dw.classList.add('active'); }
-                else closeD();
-            }
-        }, {passive: true});
+        function openD() { if(!MASTER_URL) return alert("Server Offline!"); document.getElementById('dw').classList.add('active'); document.getElementById('ov').style.display='block'; renderChat(); }
+        function closeD() { document.getElementById('dw').classList.remove('active'); document.getElementById('ov').style.display='none'; }
     </script>
 </body>
-                                 </html>
-            
+                        </html>
+                        
