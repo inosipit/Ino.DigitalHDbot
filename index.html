@@ -33,13 +33,7 @@
         #prog-bar { width: 0%; height: 100%; background: #bc13fe; transition: 0.3s; }
         #prog-txt { font-size: 9px; color: #bc13fe; font-weight: 700; margin-top: 8px; display: none; text-transform: uppercase; text-align: center; }
 
-        /* ADMIN POPUP */
-        #adminPopup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; }
-        .pop-card { background: #111; border: 2px solid #bc13fe; padding: 25px; border-radius: 20px; width: 280px; text-align: center; }
-        .pop-card input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
-        .btn-pop { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; margin-top: 5px; text-transform: uppercase; }
-
-        /* CHAT SUPPORT */
+        /* CHAT SUPPORT UI */
         .btn-cs { position: fixed; bottom: 90px; right: 20px; background: #111; color: #333; padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 10px; z-index: 50; transition: 0.3s; }
         .btn-cs.online { background: #bc13fe; color: #fff; box-shadow: 0 0 15px rgba(188,19,254,0.4); cursor: pointer; }
         #ov { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1000; }
@@ -49,9 +43,23 @@
         .msg { padding: 10px 15px; border-radius: 15px; font-size: 12px; max-width: 85%; line-height: 1.4; }
         .m-u { align-self: flex-end; background: #bc13fe; color: #fff; border-bottom-right-radius: 2px; }
         .m-a { align-self: flex-start; background: #1a1a1a; color: #ccc; border: 1px solid #333; border-bottom-left-radius: 2px; }
+
+        /* ANIMASI TITIK MENGETIK */
+        .typing { display: flex; align-items: center; gap: 4px; padding: 10px 15px; background: #1a1a1a; border: 1px solid #333; border-radius: 15px; border-bottom-left-radius: 2px; width: fit-content; margin-bottom: 5px; align-self: flex-start; }
+        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+
         .in-area { padding: 15px 15px 35px 15px; background: #080808; }
         .in-box { display: flex; align-items: center; background: #111; padding: 5px 15px; border-radius: 30px; border: 1px solid #333; }
         #msgIn { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
+        
+        /* ADMIN POPUP */
+        #adminPopup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .pop-card { background: #111; border: 2px solid #bc13fe; padding: 25px; border-radius: 20px; width: 280px; text-align: center; }
+        .pop-card input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
+        .btn-pop { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; margin-top: 5px; text-transform: uppercase; }
 
         footer { position: fixed; bottom: 0; width: 100%; padding: 20px; background: #000; text-align: center; border-top: 1px solid #111; }
         .copy-neon { color: #222; font-size: 9px; font-weight: 900; transition: 0.3s; letter-spacing: 2px; }
@@ -85,14 +93,14 @@
 
     <div id="adminPopup">
         <div class="pop-card">
-            <h3 id="popTitle" style="color:#bc13fe; font-size:12px; margin-bottom:15px">ADMIN LOGIN</h3>
+            <h3 style="color:#bc13fe; font-size:12px; margin-bottom:15px">ADMIN LOGIN</h3>
             <div id="stepPassword">
                 <input type="password" id="adminPass" placeholder="Password Admin">
                 <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="verifikasiPass()">NEXT</button>
                 <button class="btn-pop" style="background:transparent; color:#555" onclick="tutupAdmin()">BATAL</button>
             </div>
             <div id="stepLink" style="display:none">
-                <input type="text" id="adminLink" placeholder="https://link.lhr.life">
+                <input type="text" id="adminLink" placeholder="https://link.trycloudflare.com">
                 <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="simpanLink()">AKTIFKAN</button>
             </div>
         </div>
@@ -122,7 +130,14 @@
         let myID = localStorage.getItem('ino_userid') || "ID-" + Math.floor(1000+Math.random()*9000);
         localStorage.setItem('ino_userid', myID);
 
-        let canChat = true;
+        let isTyping = false;
+        let chatH = JSON.parse(localStorage.getItem('chat_ino')) || [];
+
+        // CEK PESAN AWAL (Sambutan)
+        if(chatH.length === 0) {
+            chatH.push({type:'a', txt: "Halo bos! Ada yang bisa saya bantu terkait proses HD foto?"});
+            localStorage.setItem('chat_ino', JSON.stringify(chatH));
+        }
 
         function updateUI(isOnline) {
             const el = {
@@ -135,7 +150,6 @@
                 pilih: document.getElementById('pilihBtn'),
                 tag: document.getElementById('tagline')
             };
-
             if(isOnline) {
                 el.btn.innerText = "MULAI PROSES HD"; el.btn.classList.add('active-btn'); el.btn.disabled = false;
                 el.logo.classList.add('online'); el.title.classList.add('online'); el.hd.style.color = "#bc13fe";
@@ -149,89 +163,95 @@
             }
         }
 
+        // CEK SERVER ANTI-OFFLINE (CORS FIXED)
         async function cekServer() {
             if(!MASTER_URL) return updateUI(false);
+            let clean = MASTER_URL.replace(/\/$/, "");
             try {
-                const res = await fetch(`${MASTER_URL}/`, { priority: 'high' });
+                const res = await fetch(`${clean}/`, {
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
                 updateUI(res.ok);
             } catch(e) { updateUI(false); }
         }
-        cekServer();
+        setInterval(cekServer, 10000); cekServer();
 
         // ADMIN PANEL
         let clicks = 0;
         document.getElementById('secretLogo').onclick = () => {
-            clicks++;
-            if(clicks >= 10) { document.getElementById('adminPopup').style.display='flex'; clicks=0; }
+            clicks++; if(clicks >= 10) { document.getElementById('adminPopup').style.display='flex'; clicks=0; }
             setTimeout(()=>clicks=0, 3000);
         };
         function verifikasiPass() {
             if(document.getElementById('adminPass').value === PASS_ADMIN) {
                 document.getElementById('stepPassword').style.display='none';
                 document.getElementById('stepLink').style.display='block';
-                document.getElementById('adminLink').value = MASTER_URL;
-            } else { alert("Password Salah Bos!"); }
+            } else { alert("Salah!"); }
         }
         function simpanLink() {
             let l = document.getElementById('adminLink').value.trim();
-            if(!l.startsWith("https://") || !l.includes(".")) return alert("Link Invalid! Wajib lengkap.");
+            if(!l.startsWith("https://")) return alert("Wajib HTTPS!");
             localStorage.setItem('master_link', l); location.reload();
         }
-        function tutupAdmin() { document.getElementById('adminPopup').style.display='none'; document.getElementById('adminPass').value=""; }
+        function tutupAdmin() { document.getElementById('adminPopup').style.display='none'; }
 
-        // PROCESS HD + COOLDOWN 30S
+        // PROSES HD
         async function prosesHD() {
-            const f = document.getElementById('f'); if(!f.files[0]) return alert("Pilih foto dulu bos!");
+            const f = document.getElementById('f'); if(!f.files[0]) return alert("Pilih foto!");
             const b = document.getElementById('mainBtn');
+            const clean = MASTER_URL.replace(/\/$/, "");
+            
             b.disabled = true; b.classList.remove('active-btn'); b.innerText = "MENGIRIM...";
             document.getElementById('prog-cont').style.display='block';
             document.getElementById('prog-txt').style.display='block';
+            document.getElementById('prog-bar').style.width="30%";
 
             const fd = new FormData(); fd.append('file', f.files[0]);
             try {
-                const res = await fetch(`${MASTER_URL}/upload`, {method:'POST', body:fd});
+                const res = await fetch(`${clean}/upload`, {method:'POST', body:fd});
                 const data = await res.json();
                 document.getElementById('prog-bar').style.width="100%";
+                document.getElementById('prog-txt').innerText = "MENUNGGU HASIL BOT...";
+                
                 const c = setInterval(async () => {
-                    const r = await fetch(`${MASTER_URL}/check-hd/${data.filename}`);
+                    const r = await fetch(`${clean}/check-hd/${data.filename}`);
                     if(r.ok) { 
                         clearInterval(c);
                         document.getElementById('prog-cont').style.display='none';
+                        document.getElementById('prog-txt').style.display='none';
                         b.style.display='none';
                         const d = document.getElementById('dlBtn');
-                        d.style.display='block'; d.href=`${MASTER_URL}/static/uploads/HD_${data.filename}`;
-                        
-                        // START COOLDOWN 30S
-                        let s = 30;
-                        const t = setInterval(() => {
-                            s--; if(s <= 0) { clearInterval(t); location.reload(); }
-                        }, 1000);
+                        d.style.display='block'; d.href=`${clean}/static/uploads/HD_${data.filename}`;
                     }
                 }, 5000);
-            } catch(e) { alert("Error!"); location.reload(); }
+            } catch(e) { alert("Gagal!"); location.reload(); }
         }
 
-        // REAL-TIME CHAT
-        let chatH = JSON.parse(localStorage.getItem('chat_ino')) || [];
+        // CHAT RENDER + TYPING ANIMATION
         function renderChat() {
             const l = document.getElementById('lgs');
-            l.innerHTML = chatH.map(m => `<div class="msg ${m.type==='u'?'m-u':'m-a'}">${m.type==='a'?'<b>ADMIN:</b><br>':''}${m.txt}</div>`).join('');
+            l.innerHTML = chatH.map(m => `<div class="msg ${m.type==='u'?'m-u':'m-a'}">${m.type==='a'?'<b>SUPPORT:</b><br>':''}${m.txt}</div>`).join('');
+            if(isTyping) {
+                l.innerHTML += `<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+            }
             l.scrollTop = l.scrollHeight;
         }
 
         async function send() {
-            if(!canChat) return alert("Sabar bos, jangan spam!");
             const i = document.getElementById('msgIn'); if(!i.value) return;
             const val = i.value; chatH.push({type:'u', txt: val}); renderChat(); i.value = "";
-            canChat = false; document.getElementById('sendBtn').style.opacity = "0.3";
+            
+            // SIMULASI MENGETIK SETELAH USER CHAT
+            setTimeout(() => { isTyping = true; renderChat(); }, 1500);
+
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${myID}\n💬 ${val}\n\n(Balas pesan ini untuk reply)`})
+                body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${myID}\n💬 ${val}`})
             });
-            setTimeout(() => { canChat = true; document.getElementById('sendBtn').style.opacity = "1"; }, 3000);
             localStorage.setItem('chat_ino', JSON.stringify(chatH));
         }
 
+        // POLLING PESAN DARI TELEGRAM
         setInterval(async () => {
             try {
                 const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
@@ -240,6 +260,7 @@
                     d.result.forEach(u => {
                         if(u.message && u.message.reply_to_message && u.message.reply_to_message.text.includes(myID)) {
                             const txt = u.message.text;
+                            isTyping = false; // Matikan animasi mengetik jika pesan asli masuk
                             if(!chatH.find(m => m.txt === txt && m.type === 'a')) {
                                 chatH.push({type:'a', txt: txt}); renderChat();
                                 localStorage.setItem('chat_ino', JSON.stringify(chatH));
@@ -254,5 +275,5 @@
         function closeD() { document.getElementById('dw').classList.remove('active'); document.getElementById('ov').style.display='none'; }
     </script>
 </body>
-                        </html>
-                        
+                </html>
+    
