@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,273 +8,195 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; position: fixed; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        .video-bg { position: fixed; inset: 0; z-index: -2; background: #000; overflow: hidden; }
+        .video-bg video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+        .overlay-bg { position: fixed; inset: 0; background: radial-gradient(circle, transparent 20%, #000 130%); z-index: -1; }
+        body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; width: 100%; height: 100vh; overflow: hidden; position: fixed; }
         
-        .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding-bottom: 140px; }
-        .app-card { text-align: center; width: 90%; max-width: 320px; }
+        .master-wrapper { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10; }
+        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #111; transition: 0.5s; cursor: pointer; }
+        .upload-box { background: rgba(5, 5, 5, 0.6); border: 1px solid #111; padding: 25px; border-radius: 15px; width: 320px; backdrop-filter: blur(10px); }
+        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #222; }
+
+        /* BATTERY CELL BAR */
+        #prog-wrapper { width: 100%; display: none; align-items: center; gap: 10px; margin-top: 15px; }
+        #prog-cont { flex: 1; height: 14px; background: rgba(255,255,255,0.05); border: 1px solid #222; padding: 2px; border-radius: 4px; overflow: hidden; }
+        #prog-bar { width: 0%; height: 100%; background: repeating-linear-gradient(90deg, #bc13fe, #bc13fe 4px, transparent 4px, transparent 6px); transition: 0.3s; }
+        #prog-perc { font-size: 10px; font-weight: 900; color: #bc13fe; min-width: 35px; text-align: right; }
+
+        #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,51,51,0.5); }
+
+        /* CHAT DRAWER */
+        #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; }
+        #drawer { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); display: flex; flex-direction: column; }
+        #drawer.open { transform: translateY(0); }
+        .slide-handle { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; touch-action: none; cursor: grab; }
+        .handle-bar { width: 40px; height: 5px; background: #333; border-radius: 10px; }
+        #chatLogs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 10px 14px; font-size: 12px; max-width: 85%; border-radius: 15px; line-height: 1.4; width: fit-content; }
+        .m-bot { align-self: flex-start; background: #111; color: #ccc; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
+        .m-user { align-self: flex-end; background: #bc13fe; color: #fff; border-radius: 15px 15px 2px 15px; }
+
+        /* TITIK NGAMBANG */
+        .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 12px 16px; background: #111; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
+        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* POPUP ADMIN */
+        #adminPop { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .pop-card { background: #080808; border: 1px solid #bc13fe; padding: 30px; border-radius: 20px; width: 300px; text-align: center; }
+        .pop-card input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 10px; text-align: center; outline: none; }
         
-        /* LOGO & UI STATES */
-        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #222; box-shadow: 0 0 10px #111; margin-bottom: 15px; cursor: pointer; transition: 0.3s; }
-        .logo-img.online { border-color: #bc13fe; box-shadow: 0 0 20px #bc13fe; }
-        h2 { font-weight: 900; letter-spacing: 2px; margin: 0; font-size: 1.3rem; color: #333; transition: 0.3s; }
-        h2.online { color: #fff; }
-        .tag { color: #222; font-size: 10px; letter-spacing: 3px; margin-bottom: 25px; text-transform: uppercase; transition: 0.3s; }
-        .tag.online { color: #444; }
-
-        /* BUTTONS */
-        .upload-box { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; }
-        .btn-up { background: #111; color: #444; border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: 900; margin-top: 10px; cursor: not-allowed; text-transform: uppercase; transition: 0.4s; font-size: 11px; }
-        .btn-up.active-btn { background: #bc13fe !important; color: #fff !important; cursor: pointer !important; box-shadow: 0 0 15px rgba(188,19,254,0.4); }
-        .btn-pilih { background: #0a0a0a; border: 1px dashed #222; color: #444; cursor: pointer; margin-bottom: 5px; }
-        .btn-pilih.online { border-color: #333; color: #fff; }
-
-        /* PROGRESS */
-        #prog-cont { width: 100%; height: 6px; background: #111; border-radius: 10px; margin-top: 15px; display: none; overflow: hidden; }
-        #prog-bar { width: 0%; height: 100%; background: #bc13fe; transition: 0.3s; }
-        #prog-txt { font-size: 9px; color: #bc13fe; font-weight: 700; margin-top: 8px; display: none; text-transform: uppercase; text-align: center; }
-
-        /* CHAT SUPPORT UI */
-        .btn-cs { position: fixed; bottom: 90px; right: 20px; background: #111; color: #333; padding: 12px 20px; border-radius: 50px; font-weight: 900; font-size: 10px; z-index: 50; transition: 0.3s; }
-        .btn-cs.online { background: #bc13fe; color: #fff; box-shadow: 0 0 15px rgba(188,19,254,0.4); cursor: pointer; }
-        #ov { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 1000; }
-        #dw { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 1001; transform: translateY(100%); transition: 0.4s; display: flex; flex-direction: column; }
-        #dw.active { transform: translateY(0); }
-        .logs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .msg { padding: 10px 15px; border-radius: 15px; font-size: 12px; max-width: 85%; line-height: 1.4; }
-        .m-u { align-self: flex-end; background: #bc13fe; color: #fff; border-bottom-right-radius: 2px; }
-        .m-a { align-self: flex-start; background: #1a1a1a; color: #ccc; border: 1px solid #333; border-bottom-left-radius: 2px; }
-
-        /* ANIMASI TITIK MENGETIK */
-        .typing { display: flex; align-items: center; gap: 4px; padding: 10px 15px; background: #1a1a1a; border: 1px solid #333; border-radius: 15px; border-bottom-left-radius: 2px; width: fit-content; margin-bottom: 5px; align-self: flex-start; }
-        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
-
-        .in-area { padding: 15px 15px 35px 15px; background: #080808; }
-        .in-box { display: flex; align-items: center; background: #111; padding: 5px 15px; border-radius: 30px; border: 1px solid #333; }
-        #msgIn { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
-        
-        /* ADMIN POPUP */
-        #adminPopup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; }
-        .pop-card { background: #111; border: 2px solid #bc13fe; padding: 25px; border-radius: 20px; width: 280px; text-align: center; }
-        .pop-card input { width: 100%; background: #222; border: 1px solid #333; padding: 12px; border-radius: 10px; color: #fff; margin-bottom: 10px; outline: none; }
-        .btn-pop { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; margin-top: 5px; text-transform: uppercase; }
-
-        footer { position: fixed; bottom: 0; width: 100%; padding: 20px; background: #000; text-align: center; border-top: 1px solid #111; }
-        .copy-neon { color: #222; font-size: 9px; font-weight: 900; transition: 0.3s; letter-spacing: 2px; }
-        .copy-neon.online { color: #bc13fe; }
+        .online .logo-img { border-color: #bc13fe !important; opacity: 1; filter: grayscale(0); }
+        .online #mainBtn { background: #bc13fe !important; color: #fff !important; cursor: pointer; border: none; }
+        footer { width: 100%; padding: 20px; text-align: center; position: fixed; bottom: 0; z-index: 10; }
+        .legal-item { font-size: 8px; color: #fff; text-transform: uppercase; font-weight: 700; opacity: 0.4; margin: 0 10px; }
     </style>
 </head>
-<body>
+<body id="masterBody">
 
-    <div class="container">
-        <div class="app-card">
-            <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="secretLogo">
-            <h2 id="mainTitle">INO.DIGITAL <span style="color:#222" id="hdSpan">HD</span></h2>
-            <div class="tag" id="tagline">AI Photo Restorer</div>
-            
-            <div class="upload-box">
-                <input type="file" id="f" accept="image/*" style="display:none">
-                <button class="btn-up btn-pilih" id="pilihBtn" onclick="document.getElementById('f').click()">
-                    <i class="fas fa-image"></i> PILIH FOTO
-                </button>
-                <button id="mainBtn" class="btn-up" onclick="prosesHD()" disabled>SERVER OFFLINE</button>
-                
+    <div class="video-bg"><video autoplay loop muted playsinline><source src="https://files.catbox.moe/o2crck.mp4" type="video/mp4"></video></div>
+    <div class="overlay-bg"></div>
+
+    <div class="master-wrapper">
+        <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="logoIno">
+        <h2 style="margin-top:15px; font-weight:900;">INO.DIGITAL HD</h2>
+        <p style="font-size:10px; color:white; margin-top:5px; opacity:0.8;">The Best AI Restoration Tools</p>
+        <div style="font-size:8px; color:white; letter-spacing:3px; opacity:0.4; margin-bottom:20px;">AI PHOTO RESTORER</div>
+        <div class="upload-box">
+            <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
+            <input type="file" id="f" hidden onchange="window.hasPhoto=true; showAlert('FOTO SIAP!', '#00ff88');">
+            <button id="mainBtn" class="btn-base" onclick="handleProses()" style="margin-top:10px;">OFFLINE</button>
+            <div id="prog-wrapper">
                 <div id="prog-cont"><div id="prog-bar"></div></div>
-                <div id="prog-txt">SEDANG MEMPROSES...</div>
-                
-                <a id="dlBtn" style="display:none; text-decoration:none;" download>
-                    <button class="btn-up active-btn" style="background:#00ff88 !important; color:#000 !important;">SIMPAN KE GALERI</button>
-                </a>
+                <div id="prog-perc">0%</div>
             </div>
+            <div id="alert-msg">NOTIFIKASI</div>
         </div>
     </div>
 
-    <div id="adminPopup">
+    <div id="adminPop">
         <div class="pop-card">
-            <h3 style="color:#bc13fe; font-size:12px; margin-bottom:15px">ADMIN LOGIN</h3>
-            <div id="stepPassword">
-                <input type="password" id="adminPass" placeholder="Password Admin">
-                <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="verifikasiPass()">NEXT</button>
-                <button class="btn-pop" style="background:transparent; color:#555" onclick="tutupAdmin()">BATAL</button>
+            <div id="pwStep">
+                <input type="password" id="adminPw" placeholder="PASSWORD ADMIN">
+                <button onclick="checkPw()" style="width:100%; padding:12px; background:#bc13fe; border:none; border-radius:10px; color:#fff; font-weight:900; margin-top:10px;">MASUK</button>
             </div>
-            <div id="stepLink" style="display:none">
-                <input type="text" id="adminLink" placeholder="https://link.trycloudflare.com">
-                <button class="btn-pop" style="background:#bc13fe; color:#fff" onclick="simpanLink()">AKTIFKAN</button>
+            <div id="linkStep" style="display:none;">
+                <input type="text" id="newUrl" placeholder="LINK CLOUDFLARE">
+                <button onclick="saveLink()" style="width:100%; padding:12px; background:#00ff88; border:none; border-radius:10px; color:#000; font-weight:900; margin-top:10px;">AKTIFKAN</button>
             </div>
         </div>
     </div>
 
-    <div class="btn-cs" id="csBtn" onclick="openD()"><i class="fas fa-comment-dots"></i> SUPPORT</div>
-    <div id="ov" onclick="closeD()"></div>
-    <div id="dw">
-        <div style="padding:15px; border-bottom:1px solid #111; text-align:center; color:#bc13fe; font-weight:900; font-size:10px">INO SUPPORT REALTIME</div>
-        <div class="logs" id="lgs"></div>
-        <div class="in-area">
-            <div class="in-box">
-                <input type="text" id="msgIn" placeholder="Tulis kendala...">
-                <button id="sendBtn" onclick="send()" style="background:none; border:none; color:#bc13fe;"><i class="fas fa-paper-plane"></i></button>
-            </div>
+    <div id="csBtn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i></div>
+    <div id="drawer">
+        <div class="slide-handle" id="dragArea"><div class="handle-bar"></div></div>
+        <div id="chatLogs">
+            <div class="msg m-bot">Halo Bos! 👋 Ada Yang Bisa Ino.Digital Bantu?.</div>
+            <div id="typIn" class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+        <div style="padding:15px; display:flex; gap:10px; background:#050505; padding-bottom:40px;">
+            <input type="text" id="msgIn" placeholder="Tulis kendala..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px; border-radius:10px; outline:none;">
+            <button onclick="sendMsg()" style="background:#bc13fe; border:none; color:#fff; width:45px; border-radius:10px;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <footer><div class="copy-neon" id="footerNeon">© 2026 INO.DIGITAL HD</div></footer>
+    <footer>
+        <div style="color:#bc13fe; font-size:9px; font-weight:900; margin-bottom:8px;">© 2026 INO.DIGITAL</div>
+        <div><span class="legal-item">Privacy Policy</span><span class="legal-item">Usage Protocol</span></div>
+    </footer>
 
     <script>
-        const PASS_ADMIN = "ino.digital";
-        const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c";
-        const ADMIN_ID = "8379816457";
-        
+        const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
         let MASTER_URL = localStorage.getItem('master_link') || "";
-        let myID = localStorage.getItem('ino_userid') || "ID-" + Math.floor(1000+Math.random()*9000);
-        localStorage.setItem('ino_userid', myID);
+        let userID = localStorage.getItem('ino_uid') || "ID-" + Math.floor(Math.random()*9999);
+        localStorage.setItem('ino_uid', userID);
 
-        let isTyping = false;
-        let chatH = JSON.parse(localStorage.getItem('chat_ino')) || [];
+        let sudahBalasOtomatis = false, lastUpd = 0, processedMsgIds = new Set();
 
-        // CEK PESAN AWAL (Sambutan)
-        if(chatH.length === 0) {
-            chatH.push({type:'a', txt: "Halo bos! Ada yang bisa saya bantu terkait proses HD foto?"});
-            localStorage.setItem('chat_ino', JSON.stringify(chatH));
+        function showAlert(msg, color = "#ff3333") {
+            const a = document.getElementById('alert-msg');
+            a.innerText = msg; a.style.color = color; a.style.display = 'block';
+            setTimeout(() => { a.style.display = 'none'; }, 3000);
         }
 
-        function updateUI(isOnline) {
-            const el = {
-                btn: document.getElementById('mainBtn'),
-                logo: document.getElementById('secretLogo'),
-                hd: document.getElementById('hdSpan'),
-                title: document.getElementById('mainTitle'),
-                footer: document.getElementById('footerNeon'),
-                cs: document.getElementById('csBtn'),
-                pilih: document.getElementById('pilihBtn'),
-                tag: document.getElementById('tagline')
-            };
-            if(isOnline) {
-                el.btn.innerText = "MULAI PROSES HD"; el.btn.classList.add('active-btn'); el.btn.disabled = false;
-                el.logo.classList.add('online'); el.title.classList.add('online'); el.hd.style.color = "#bc13fe";
-                el.footer.classList.add('online'); el.cs.classList.add('online'); el.pilih.classList.add('online');
-                el.tag.classList.add('online');
-            } else {
-                el.btn.innerText = "SERVER OFFLINE"; el.btn.classList.remove('active-btn'); el.btn.disabled = true;
-                el.logo.classList.remove('online'); el.title.classList.remove('online'); el.hd.style.color = "#222";
-                el.footer.classList.remove('online'); el.cs.classList.remove('online'); el.pilih.classList.remove('online');
-                el.tag.classList.remove('online');
+        let cl = 0;
+        document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
+        function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
+        function saveLink() { let l = document.getElementById('newUrl').value; if(l){ localStorage.setItem('master_link', l); location.reload(); } }
+
+        function toggleChat() { document.getElementById('drawer').classList.toggle('open'); }
+        async function sendMsg() {
+            const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
+            if(!inp.value.trim()) return;
+            const t = inp.value; 
+            const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = t;
+            logs.insertBefore(uM, typ); inp.value = ''; logs.scrollTop = logs.scrollHeight;
+            if (!sudahBalasOtomatis) {
+                setTimeout(() => {
+                    const sM = document.createElement('div'); sM.className = 'msg m-bot'; sM.innerText = "Pesan terkirim ke admin.";
+                    logs.insertBefore(sM, typ); logs.scrollTop = logs.scrollHeight;
+                    sudahBalasOtomatis = true;
+                }, 500);
             }
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${userID}\n💬 ${t}`}) });
         }
 
-        // CEK SERVER ANTI-OFFLINE (CORS FIXED)
-        async function cekServer() {
-            if(!MASTER_URL) return updateUI(false);
-            let clean = MASTER_URL.replace(/\/$/, "");
-            try {
-                const res = await fetch(`${clean}/`, {
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-                updateUI(res.ok);
-            } catch(e) { updateUI(false); }
-        }
-        setInterval(cekServer, 10000); cekServer();
-
-        // ADMIN PANEL
-        let clicks = 0;
-        document.getElementById('secretLogo').onclick = () => {
-            clicks++; if(clicks >= 10) { document.getElementById('adminPopup').style.display='flex'; clicks=0; }
-            setTimeout(()=>clicks=0, 3000);
-        };
-        function verifikasiPass() {
-            if(document.getElementById('adminPass').value === PASS_ADMIN) {
-                document.getElementById('stepPassword').style.display='none';
-                document.getElementById('stepLink').style.display='block';
-            } else { alert("Salah!"); }
-        }
-        function simpanLink() {
-            let l = document.getElementById('adminLink').value.trim();
-            if(!l.startsWith("https://")) return alert("Wajib HTTPS!");
-            localStorage.setItem('master_link', l); location.reload();
-        }
-        function tutupAdmin() { document.getElementById('adminPopup').style.display='none'; }
-
-        // PROSES HD
-        async function prosesHD() {
-            const f = document.getElementById('f'); if(!f.files[0]) return alert("Pilih foto!");
-            const b = document.getElementById('mainBtn');
-            const clean = MASTER_URL.replace(/\/$/, "");
-            
-            b.disabled = true; b.classList.remove('active-btn'); b.innerText = "MENGIRIM...";
-            document.getElementById('prog-cont').style.display='block';
-            document.getElementById('prog-txt').style.display='block';
-            document.getElementById('prog-bar').style.width="30%";
-
-            const fd = new FormData(); fd.append('file', f.files[0]);
-            try {
-                const res = await fetch(`${clean}/upload`, {method:'POST', body:fd});
-                const data = await res.json();
-                document.getElementById('prog-bar').style.width="100%";
-                document.getElementById('prog-txt').innerText = "MENUNGGU HASIL BOT...";
-                
-                const c = setInterval(async () => {
-                    const r = await fetch(`${clean}/check-hd/${data.filename}`);
-                    if(r.ok) { 
-                        clearInterval(c);
-                        document.getElementById('prog-cont').style.display='none';
-                        document.getElementById('prog-txt').style.display='none';
-                        b.style.display='none';
-                        const d = document.getElementById('dlBtn');
-                        d.style.display='block'; d.href=`${clean}/static/uploads/HD_${data.filename}`;
-                    }
-                }, 5000);
-            } catch(e) { alert("Gagal!"); location.reload(); }
-        }
-
-        // CHAT RENDER + TYPING ANIMATION
-        function renderChat() {
-            const l = document.getElementById('lgs');
-            l.innerHTML = chatH.map(m => `<div class="msg ${m.type==='u'?'m-u':'m-a'}">${m.type==='a'?'<b>SUPPORT:</b><br>':''}${m.txt}</div>`).join('');
-            if(isTyping) {
-                l.innerHTML += `<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-            }
-            l.scrollTop = l.scrollHeight;
-        }
-
-        async function send() {
-            const i = document.getElementById('msgIn'); if(!i.value) return;
-            const val = i.value; chatH.push({type:'u', txt: val}); renderChat(); i.value = "";
-            
-            // SIMULASI MENGETIK SETELAH USER CHAT
-            setTimeout(() => { isTyping = true; renderChat(); }, 1500);
-
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${myID}\n💬 ${val}`})
-            });
-            localStorage.setItem('chat_ino', JSON.stringify(chatH));
-        }
-
-        // POLLING PESAN DARI TELEGRAM
         setInterval(async () => {
             try {
-                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`);
+                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd+1}`);
                 const d = await r.json();
-                if(d.ok) {
-                    d.result.forEach(u => {
-                        if(u.message && u.message.reply_to_message && u.message.reply_to_message.text.includes(myID)) {
-                            const txt = u.message.text;
-                            isTyping = false; // Matikan animasi mengetik jika pesan asli masuk
-                            if(!chatH.find(m => m.txt === txt && m.type === 'a')) {
-                                chatH.push({type:'a', txt: txt}); renderChat();
-                                localStorage.setItem('chat_ino', JSON.stringify(chatH));
-                            }
-                        }
-                    });
-                }
+                if(d.ok) d.result.forEach(u => {
+                    lastUpd = u.update_id;
+                    const msgId = u.message?.message_id;
+                    if(msgId && !processedMsgIds.has(msgId) && u.message?.reply_to_message?.text.includes(userID)) {
+                        processedMsgIds.add(msgId);
+                        const logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
+                        typ.style.display = 'flex'; logs.scrollTop = logs.scrollHeight;
+                        setTimeout(() => {
+                            typ.style.display = 'none';
+                            const bM = document.createElement('div'); bM.className = 'msg m-bot'; bM.innerText = u.message.text;
+                            logs.insertBefore(bM, typ); logs.scrollTop = logs.scrollHeight;
+                        }, 2000);
+                    }
+                });
             } catch(e){}
         }, 3000);
 
-        function openD() { if(!MASTER_URL) return alert("Server Offline!"); document.getElementById('dw').classList.add('active'); document.getElementById('ov').style.display='block'; renderChat(); }
-        function closeD() { document.getElementById('dw').classList.remove('active'); document.getElementById('ov').style.display='none'; }
+        let startY, currentY;
+        document.getElementById('dragArea').addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; document.getElementById('drawer').style.transition = 'none'; });
+        document.getElementById('dragArea').addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) document.getElementById('drawer').style.transform = `translateY(${currentY}px)`; });
+        document.getElementById('dragArea').addEventListener('touchend', () => { const dr = document.getElementById('drawer'); dr.style.transition = 'transform 0.4s'; if (currentY > 150) dr.classList.remove('open'); dr.style.transform = ''; currentY = 0; });
+
+        function handleProses() {
+            // SATPAM UTAMA: CEK LINK DULU SEBELUM NGAPA-NGAPAIN
+            if(!MASTER_URL || MASTER_URL === "" || !document.getElementById('masterBody').classList.contains('Offline')) {
+                return showAlert("LINK BLOM DI SET ADMIN");
+            }
+
+            // CEK FOTO
+            if(!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
+
+            // KALAU SEMUA OK, BARU JALANKAN TAMPILAN PROSES
+            document.getElementById('mainBtn').style.display = 'none';
+            document.getElementById('pilihBtn').style.display = 'none';
+            document.getElementById('prog-wrapper').style.display = 'flex';
+            let p = 0;
+            const iv = setInterval(() => { p++; if(p >= 95) { p = 95; clearInterval(iv); showAlert("MENUNGGU BOT...", "#bc13fe"); } document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 200);
+        }
+
+        async function cek() {
+            const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
+            if (!MASTER_URL) { body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
+            try {
+                const res = await fetch(`${MASTER_URL.replace(/\/$/, "")}/`, { headers:{'ngrok-skip-browser-warning':'true'}, signal:AbortSignal.timeout(3000) });
+                if (res.ok) { body.classList.add('online'); btn.innerText = "PROSES HD"; }
+                else { body.classList.remove('online'); btn.innerText = "OFFLINE"; }
+            } catch (e) { body.classList.remove('online'); btn.innerText = "OFFLINE"; }
+        }
+        setInterval(cek, 5000); cek();
     </script>
 </body>
-                </html>
-    
+</html>
