@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,25 +9,26 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         .video-bg { position: fixed; inset: 0; z-index: -2; background: #000; overflow: hidden; }
-        .video-bg video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; }
+        .video-bg video { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
         .overlay-bg { position: fixed; inset: 0; background: radial-gradient(circle, transparent 20%, #000 130%); z-index: -1; }
         body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; width: 100%; height: 100vh; overflow: hidden; position: fixed; }
         
         .master-wrapper { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10; }
-        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 2px solid #111; transition: 0.5s; cursor: pointer; }
+        .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #111; transition: 0.5s; cursor: pointer; }
         .upload-box { background: rgba(5, 5, 5, 0.6); border: 1px solid #111; padding: 25px; border-radius: 15px; width: 320px; backdrop-filter: blur(10px); }
-        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #222; }
+        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; }
 
-        /* BATTERY CELL BAR */
+        .online .logo-img { border-color: #bc13fe !important; box-shadow: 0 0 15px #bc13fe; }
+        .online #mainBtn { background: #bc13fe !important; color: #fff !important; border: none; cursor: pointer; }
+
         #prog-wrapper { width: 100%; display: none; align-items: center; gap: 10px; margin-top: 15px; }
         #prog-cont { flex: 1; height: 14px; background: rgba(255,255,255,0.05); border: 1px solid #222; padding: 2px; border-radius: 4px; overflow: hidden; }
         #prog-bar { width: 0%; height: 100%; background: repeating-linear-gradient(90deg, #bc13fe, #bc13fe 4px, transparent 4px, transparent 6px); transition: 0.3s; }
         #prog-perc { font-size: 10px; font-weight: 900; color: #bc13fe; min-width: 35px; text-align: right; }
+        #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
-        #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(255,51,51,0.5); }
-
-        /* CHAT DRAWER */
-        #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; }
+        /* CHAT UI */
+        #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); }
         #drawer { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); display: flex; flex-direction: column; }
         #drawer.open { transform: translateY(0); }
         .slide-handle { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; touch-action: none; cursor: grab; }
@@ -38,19 +38,20 @@
         .m-bot { align-self: flex-start; background: #111; color: #ccc; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
         .m-user { align-self: flex-end; background: #bc13fe; color: #fff; border-radius: 15px 15px 2px 15px; }
 
-        /* TITIK NGAMBANG */
-        .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 12px 16px; background: #111; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
-        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        /* ANIMASI LAMBAI */
+        .wave-text span { display: inline-block; animation: wave 1.5s infinite; animation-delay: calc(.05s * var(--i)); }
+        @keyframes wave { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-5px); color: #bc13fe; } }
+
+        /* TYPING INDICATOR */
+        .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 12px 16px; background: #111; border-radius: 15px; border: 1px solid #222; margin-bottom: 5px; }
+        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        /* POPUP ADMIN */
         #adminPop { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .pop-card { background: #080808; border: 1px solid #bc13fe; padding: 30px; border-radius: 20px; width: 300px; text-align: center; }
-        .pop-card input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 10px; text-align: center; outline: none; }
+        .pop-card input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 10px; outline: none; }
         
-        .online .logo-img { border-color: #bc13fe !important; opacity: 1; filter: grayscale(0); }
-        .online #mainBtn { background: #bc13fe !important; color: #fff !important; cursor: pointer; border: none; }
         footer { width: 100%; padding: 20px; text-align: center; position: fixed; bottom: 0; z-index: 10; }
         .legal-item { font-size: 8px; color: #fff; text-transform: uppercase; font-weight: 700; opacity: 0.4; margin: 0 10px; }
     </style>
@@ -62,10 +63,8 @@
 
     <div class="master-wrapper">
         <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="logoIno">
-        <h2 style="margin-top:15px; font-weight:900;">INO.DIGITAL HD</h2>
-        <p style="font-size:10px; color:white; margin-top:5px; opacity:0.8;">The Best AI Restoration Tools</p>
-        <div style="font-size:8px; color:white; letter-spacing:3px; opacity:0.4; margin-bottom:20px;">AI PHOTO RESTORER</div>
-        <div class="upload-box">
+        <h2 style="margin-top:15px; font-weight:900; letter-spacing: 2px;">INO.DIGITAL HD</h2>
+        <div class="upload-box" style="margin-top:20px;">
             <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
             <input type="file" id="f" hidden onchange="window.hasPhoto=true; showAlert('FOTO SIAP!', '#00ff88');">
             <button id="mainBtn" class="btn-base" onclick="handleProses()" style="margin-top:10px;">OFFLINE</button>
@@ -84,8 +83,8 @@
                 <button onclick="checkPw()" style="width:100%; padding:12px; background:#bc13fe; border:none; border-radius:10px; color:#fff; font-weight:900; margin-top:10px;">MASUK</button>
             </div>
             <div id="linkStep" style="display:none;">
-                <input type="text" id="newUrl" placeholder="LINK CLOUDFLARE">
-                <button onclick="saveLink()" style="width:100%; padding:12px; background:#00ff88; border:none; border-radius:10px; color:#000; font-weight:900; margin-top:10px;">AKTIFKAN</button>
+                <input type="text" id="newUrl" placeholder="PASTE LINK SERVEO/CF">
+                <button onclick="saveLink()" style="width:100%; padding:12px; background:#00ff88; border:none; border-radius:10px; color:#000; font-weight:900; margin-top:10px;">SIMPAN</button>
             </div>
         </div>
     </div>
@@ -94,7 +93,15 @@
     <div id="drawer">
         <div class="slide-handle" id="dragArea"><div class="handle-bar"></div></div>
         <div id="chatLogs">
-            <div class="msg m-bot">Halo Bos! 👋 Ada Yang Bisa Ino.Digital Bantu?.</div>
+            <div class="msg m-bot wave-text">
+                <span style="--i:1">H</span><span style="--i:2">a</span><span style="--i:3">l</span><span style="--i:4">o</span>
+                <span style="--i:5">&nbsp;</span><span style="--i:6">A</span><span style="--i:7">d</span><span style="--i:8">a</span>
+                <span style="--i:9">&nbsp;</span><span style="--i:10">Y</span><span style="--i:11">a</span><span style="--i:12">n</span><span style="--i:13">g</span>
+                <span style="--i:14">&nbsp;</span><span style="--i:15">B</span><span style="--i:16">i</span><span style="--i:17">s</span><span style="--i:18">a</span>
+                <span style="--i:19">&nbsp;</span><span style="--i:20">A</span><span style="--i:21">d</span><span style="--i:22">m</span><span style="--i:23">i</span><span style="--i:24">n</span>
+                <span style="--i:25">&nbsp;</span><span style="--i:26">I</span><span style="--i:27">n</span><span style="--i:28">o</span><span style="--i:29">.</span><span style="--i:30">D</span><span style="--i:31">i</span><span style="--i:32">g</span><span style="--i:33">i</span><span style="--i:34">t</span><span style="--i:35">a</span><span style="--i:36">l</span>
+                <span style="--i:37">&nbsp;</span><span style="--i:38">B</span><span style="--i:39">a</span><span style="--i:40">n</span><span style="--i:41">t</span><span style="--i:42">u</span><span style="--i:43">?</span>
+            </div>
             <div id="typIn" class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
         <div style="padding:15px; display:flex; gap:10px; background:#050505; padding-bottom:40px;">
@@ -105,16 +112,20 @@
 
     <footer>
         <div style="color:#bc13fe; font-size:9px; font-weight:900; margin-bottom:8px;">© 2026 INO.DIGITAL</div>
-        <div><span class="legal-item">Privacy Policy</span><span class="legal-item">Usage Protocol</span></div>
+        <div><span class="legal-item">Secure Node</span><span class="legal-item">AI Restore</span></div>
     </footer>
 
     <script>
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
-        let MASTER_URL = localStorage.getItem('master_link') || "";
-        let userID = localStorage.getItem('ino_uid') || "ID-" + Math.floor(Math.random()*9999);
-        localStorage.setItem('ino_uid', userID);
+        let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set(), sudahBalas = false;
 
-        let sudahBalasOtomatis = false, lastUpd = 0, processedMsgIds = new Set();
+        // --- SLIDE DRAWER LOGIC ---
+        const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
+        let startY = 0, currentY = 0;
+        dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
+        dragArea.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; });
+        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
+        function toggleChat() { drawer.classList.toggle('open'); drawer.style.transform = ''; }
 
         function showAlert(msg, color = "#ff3333") {
             const a = document.getElementById('alert-msg');
@@ -125,78 +136,60 @@
         let cl = 0;
         document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
         function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
-        function saveLink() { let l = document.getElementById('newUrl').value; if(l){ localStorage.setItem('master_link', l); location.reload(); } }
+        function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
 
-        function toggleChat() { document.getElementById('drawer').classList.toggle('open'); }
-        async function sendMsg() {
-            const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
-            if(!inp.value.trim()) return;
-            const t = inp.value; 
-            const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = t;
-            logs.insertBefore(uM, typ); inp.value = ''; logs.scrollTop = logs.scrollHeight;
-            if (!sudahBalasOtomatis) {
-                setTimeout(() => {
-                    const sM = document.createElement('div'); sM.className = 'msg m-bot'; sM.innerText = "Pesan terkirim ke admin.";
-                    logs.insertBefore(sM, typ); logs.scrollTop = logs.scrollHeight;
-                    sudahBalasOtomatis = true;
-                }, 500);
-            }
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 ${userID}\n💬 ${t}`}) });
-        }
-
-        setInterval(async () => {
+        async function cekStatus() {
+            const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
+            const link = localStorage.getItem('master_link');
+            if(!link) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
             try {
-                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd+1}`);
-                const d = await r.json();
-                if(d.ok) d.result.forEach(u => {
-                    lastUpd = u.update_id;
-                    const msgId = u.message?.message_id;
-                    if(msgId && !processedMsgIds.has(msgId) && u.message?.reply_to_message?.text.includes(userID)) {
-                        processedMsgIds.add(msgId);
-                        const logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
-                        typ.style.display = 'flex'; logs.scrollTop = logs.scrollHeight;
-                        setTimeout(() => {
-                            typ.style.display = 'none';
-                            const bM = document.createElement('div'); bM.className = 'msg m-bot'; bM.innerText = u.message.text;
-                            logs.insertBefore(bM, typ); logs.scrollTop = logs.scrollHeight;
-                        }, 2000);
-                    }
-                });
-            } catch(e){}
-        }, 3000);
-
-        let startY, currentY;
-        document.getElementById('dragArea').addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; document.getElementById('drawer').style.transition = 'none'; });
-        document.getElementById('dragArea').addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) document.getElementById('drawer').style.transform = `translateY(${currentY}px)`; });
-        document.getElementById('dragArea').addEventListener('touchend', () => { const dr = document.getElementById('drawer'); dr.style.transition = 'transform 0.4s'; if (currentY > 150) dr.classList.remove('open'); dr.style.transform = ''; currentY = 0; });
+                await fetch(`${link.replace(/\/$/, "")}/`, { mode: 'no-cors', headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: AbortSignal.timeout(4000) });
+                isSystemOnline = true; body.classList.add('online'); btn.innerText = "PROSES HD";
+            } catch(e) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; }
+        }
+        setInterval(cekStatus, 5000); cekStatus();
 
         function handleProses() {
-            // SATPAM UTAMA: CEK LINK DULU SEBELUM NGAPA-NGAPAIN
-            if(!MASTER_URL || MASTER_URL === "" || !document.getElementById('masterBody').classList.contains('Online')) {
-                return showAlert("LINK BLOM DI SET ADMIN");
-            }
-
-            // CEK FOTO
-            if(!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
-
-            // KALAU SEMUA OK, BARU JALANKAN TAMPILAN PROSES
+            if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
+            if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
             document.getElementById('mainBtn').style.display = 'none';
             document.getElementById('pilihBtn').style.display = 'none';
             document.getElementById('prog-wrapper').style.display = 'flex';
             let p = 0;
-            const iv = setInterval(() => { p++; if(p >= 95) { p = 95; clearInterval(iv); showAlert("MENUNGGU BOT...", "#bc13fe"); } document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 200);
+            const iv = setInterval(() => { p++; if(p>=95){ p=95; clearInterval(iv); showAlert("MENUNGGU RESPON...", "#bc13fe"); } document.getElementById('prog-bar').style.width = p+"%"; document.getElementById('prog-perc').innerText = p+"%"; }, 200);
         }
 
-        async function cek() {
-            const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
-            if (!MASTER_URL) { body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
-            try {
-                const res = await fetch(`${MASTER_URL.replace(/\/$/, "")}/`, { headers:{'ngrok-skip-browser-warning':'true'}, signal:AbortSignal.timeout(3000) });
-                if (res.ok) { body.classList.add('online'); btn.innerText = "PROSES HD"; }
-                else { body.classList.remove('online'); btn.innerText = "OFFLINE"; }
-            } catch (e) { body.classList.remove('online'); btn.innerText = "OFFLINE"; }
+        async function sendMsg() {
+            const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
+            if(!inp.value.trim()) return;
+            const t = inp.value;
+            const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = t;
+            logs.insertBefore(uM, typ); inp.value = ''; logs.scrollTop = logs.scrollHeight;
+            if(!sudahBalas){ setTimeout(() => { const sM = document.createElement('div'); sM.className = 'msg m-bot'; sM.innerText = "Pesan terkirim ke admin."; logs.insertBefore(sM, typ); logs.scrollTop = logs.scrollHeight; sudahBalas = true; }, 500); }
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 USER\n💬 ${t}`}) });
         }
-        setInterval(cek, 5000); cek();
+        
+        setInterval(async () => {
+            try {
+                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd+1}`);
+                const d = await r.json();
+                if(d.ok && d.result.length > 0) {
+                    const logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
+                    typ.style.display = 'flex'; logs.scrollTop = logs.scrollHeight;
+                    setTimeout(() => {
+                        d.result.forEach(u => {
+                            lastUpd = u.update_id; const msgId = u.message?.message_id;
+                            if(msgId && !processedMsgIds.has(msgId)) {
+                                processedMsgIds.add(msgId); typ.style.display = 'none';
+                                const bM = document.createElement('div'); bM.className = 'msg m-bot'; bM.innerText = u.message.text;
+                                logs.insertBefore(bM, typ); logs.scrollTop = logs.scrollHeight;
+                            }
+                        });
+                    }, 2000);
+                }
+            } catch(e){}
+        }, 3000);
     </script>
 </body>
-</html>
+    </html>
+        
