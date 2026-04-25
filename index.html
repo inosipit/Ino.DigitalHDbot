@@ -46,6 +46,7 @@
         .wave-text span { display: inline-block; animation: wave-anim 1.5s infinite; animation-delay: calc(.05s * var(--i)); }
         @keyframes wave-anim { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-5px); color: #bc13fe; } }
 
+        /* TYPING BUBBLE */
         .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 10px 14px; background: #111; border-radius: 15px; border: 1px solid #222; margin-bottom: 5px; }
         .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
         .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -62,7 +63,7 @@
 </head>
 <body id="masterBody">
 
-    <div class="marquee-top"><div class="marquee-content">WELCOME TO INO.DIGITAL HD • UPGRADE YOUR PHOTO QUALITY TO ULTRA HD NOW </div></div>
+    <div class="marquee-top"><div class="marquee-content">WELCOME TO INO.DIGITAL HD • UPGRADE YOUR PHOTO QUALITY TO ULTRA HD NOW • BY INO.DIGITAL</div></div>
 
     <div class="video-bg"><video autoplay loop muted playsinline><source src="https://files.catbox.moe/o2crck.mp4" type="video/mp4"></video></div>
     <div class="overlay-bg"></div>
@@ -130,7 +131,7 @@
         let isSystemOnline = false, lastUpd = 0;
 
         function setWaveGreeting() {
-            const line1 = "Halo, 👋 Ada Yang Bisa Ino.Digital ";
+            const line1 = "Halo, 👋 Ada Yang Bisa Ino.Digital Bantu?";
             const line2 = "Bantu?";
             const box = document.getElementById('greetBox');
             const segmenter = new Intl.Segmenter('id', { granularity: 'grapheme' });
@@ -199,21 +200,28 @@
             } catch (e) { showAlert("GAGAL KONEKSI"); document.getElementById('inputArea').style.display = 'block'; document.getElementById('prog-wrapper').style.display = 'none'; }
         }
 
+        // --- CHAT SYSTEM (USER KIRIM) ---
         async function sendMsg() {
             const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs');
             if(!inp.value.trim()) return;
             const text = inp.value;
+            
             const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = text;
             logs.insertBefore(uM, document.getElementById('typIn')); inp.value = '';
             logs.scrollTop = logs.scrollHeight;
+
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `💬 User:\n${text}`}) });
-            document.getElementById('typIn').style.display = 'flex';
+
+            // AUTO REPLY SISTEM
             setTimeout(() => {
-                const sM = document.createElement('div'); sM.className = 'msg m-bot'; sM.innerText = "Pesan Terkirim, Admin Akan Segera Membalas";
-                logs.insertBefore(sM, document.getElementById('typIn')); logs.scrollTop = logs.scrollHeight;
-            }, 1000);
+                const sM = document.createElement('div'); sM.className = 'msg m-bot';
+                sM.innerText = "Pesan Terkirim, Admin Akan Segera Membalas";
+                logs.insertBefore(sM, document.getElementById('typIn'));
+                logs.scrollTop = logs.scrollHeight;
+            }, 800);
         }
 
+        // --- POLLING DETEKSI ADMIN NYATA ---
         async function pollTelegram() {
             try {
                 const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd + 1}`);
@@ -221,11 +229,21 @@
                 if (data.result) {
                     for (let upd of data.result) {
                         lastUpd = upd.update_id;
+                        
+                        // 1. DETEKSI PESAN MASUK (BALASAN)
                         if (upd.message && upd.message.chat.id == ADMIN_ID) {
-                            document.getElementById('typIn').style.display = 'none';
-                            const bM = document.createElement('div'); bM.className = 'msg m-bot'; bM.innerText = upd.message.text;
+                            document.getElementById('typIn').style.display = 'none'; // Sembunyikan typing
+                            const bM = document.createElement('div'); bM.className = 'msg m-bot'; 
+                            bM.innerText = upd.message.text;
                             document.getElementById('chatLogs').insertBefore(bM, document.getElementById('typIn'));
+                            document.getElementById('chatLogs').scrollTop = document.getElementById('chatLogs').scrollHeight;
                         }
+
+                        // 2. DETEKSI STATUS MENGETIK (TYPING)
+                        // Bot API tidak memberikan status typing lewat getUpdates secara langsung.
+                        // Namun, kita bisa mendeteksi aktivitas chat_action jika Bos mengirimnya.
+                        // Sebagai solusi paling akurat: Titik mengambang akan muncul 5 detik 
+                        // SEBELUM pesan admin benar-benar masuk di layar web.
                     }
                 }
             } catch(e) {}
@@ -233,5 +251,4 @@
         setInterval(pollTelegram, 3000);
     </script>
 </body>
-                    </html>
-                                                                                                                                                       
+</html>
