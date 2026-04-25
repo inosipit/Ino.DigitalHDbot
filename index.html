@@ -18,16 +18,18 @@
         .upload-box { background: rgba(5, 5, 5, 0.6); border: 1px solid #111; padding: 25px; border-radius: 15px; width: 320px; backdrop-filter: blur(10px); }
         .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; }
 
+        /* STATUS ONLINE NEON */
         .online .logo-img { border-color: #bc13fe !important; box-shadow: 0 0 15px #bc13fe; }
         .online #mainBtn { background: #bc13fe !important; color: #fff !important; border: none; cursor: pointer; }
 
+        /* PROGRESS BAR */
         #prog-wrapper { width: 100%; display: none; align-items: center; gap: 10px; margin-top: 15px; }
         #prog-cont { flex: 1; height: 14px; background: rgba(255,255,255,0.05); border: 1px solid #222; padding: 2px; border-radius: 4px; overflow: hidden; }
         #prog-bar { width: 0%; height: 100%; background: repeating-linear-gradient(90deg, #bc13fe, #bc13fe 4px, transparent 4px, transparent 6px); transition: 0.3s; }
         #prog-perc { font-size: 10px; font-weight: 900; color: #bc13fe; min-width: 35px; text-align: right; }
         #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* CHAT UI */
+        /* CHAT UI & DRAWER */
         #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); }
         #drawer { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); display: flex; flex-direction: column; }
         #drawer.open { transform: translateY(0); }
@@ -64,10 +66,16 @@
     <div class="master-wrapper">
         <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="logoIno">
         <h2 style="margin-top:15px; font-weight:900; letter-spacing: 2px;">INO.DIGITAL HD</h2>
+        
+        <p style="font-size: 10px; color: #666; font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">
+            AI Restoration • Ultra Boost • No Quality Loss
+        </p>
+
         <div class="upload-box" style="margin-top:20px;">
             <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
             <input type="file" id="f" hidden onchange="window.hasPhoto=true; showAlert('FOTO SIAP!', '#00ff88');">
             <button id="mainBtn" class="btn-base" onclick="handleProses()" style="margin-top:10px;">OFFLINE</button>
+            
             <div id="prog-wrapper">
                 <div id="prog-cont"><div id="prog-bar"></div></div>
                 <div id="prog-perc">0%</div>
@@ -119,10 +127,7 @@
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
         let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set(), sudahBalas = false;
 
-
-        
-
-        // --- SLIDE DRAWER LOGIC ---
+        // --- LOGIKA SLIDE DRAWER ---
         const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
         let startY = 0, currentY = 0;
         dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
@@ -136,11 +141,13 @@
             setTimeout(() => { a.style.display = 'none'; }, 3000);
         }
 
+        // --- ADMIN SYSTEM ---
         let cl = 0;
         document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
         function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
         function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
 
+        // --- CEK STATUS REAL-TIME (SATPARAM) ---
         async function cekStatus() {
             const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
             const link = localStorage.getItem('master_link');
@@ -152,60 +159,36 @@
         }
         setInterval(cekStatus, 5000); cekStatus();
 
+        // --- PROSES UPLOAD KE OTOT TERMUX ---
+        async function handleProses() {
+            if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
+            if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
 
-        
-        // --- CARI DAN GANTI FUNGSI INI DI DALAM INDEX.HTML ---
-async function handleProses() {
-    if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
-    if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
+            const fileInput = document.getElementById('f');
+            const formData = new FormData();
+            formData.append('foto', fileInput.files[0]);
 
-    // Ambil file foto dari input
-    const fileInput = document.getElementById('f');
-    const formData = new FormData();
-    formData.append('foto', fileInput.files[0]);
+            document.getElementById('mainBtn').style.display = 'none';
+            document.getElementById('pilihBtn').style.display = 'none';
+            document.getElementById('prog-wrapper').style.display = 'flex';
 
-    // Tampilan animasi progress dimulai
-    document.getElementById('mainBtn').style.display = 'none';
-    document.getElementById('pilihBtn').style.display = 'none';
-    document.getElementById('prog-wrapper').style.display = 'flex';
-    
-    let p = 0;
-    const iv = setInterval(() => { 
-        p++; 
-        if(p >= 90) { p = 90; clearInterval(iv); } // Nahan di 90% pas upload
-        document.getElementById('prog-bar').style.width = p + "%";
-        document.getElementById('prog-perc').innerText = p + "%";
-    }, 50);
+            let p = 0;
+            const iv = setInterval(() => { p++; if(p >= 90) { p = 90; clearInterval(iv); } document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 50);
 
-    try {
-        const link = localStorage.getItem('master_link');
-        // Nembak ke jalur /upload di script Python Termux
-        const response = await fetch(`${link.replace(/\/$/, "")}/upload`, {
-            method: 'POST',
-            body: formData
-        });
-        
-        const hasil = await response.json();
-        
-        if(response.ok) {
-            // Kalau sukses, bar jadi 100%
-            document.getElementById('prog-bar').style.width = "100%";
-            document.getElementById('prog-perc').innerText = "100%";
-            showAlert("BERHASIL TERKIRIM KE BOT!", "#00ff88");
-        } else {
-            showAlert("GAGAL: " + hasil.pesan);
+            try {
+                const link = localStorage.getItem('master_link');
+                const response = await fetch(`${link.replace(/\/$/, "")}/upload`, { method: 'POST', body: formData });
+                if(response.ok) {
+                    document.getElementById('prog-bar').style.width = "100%"; document.getElementById('prog-perc').innerText = "100%";
+                    showAlert("BERHASIL TERKIRIM KE BOT!", "#00ff88");
+                } else { showAlert("GAGAL KIRIM KE TERMUX"); }
+            } catch (e) {
+                showAlert("GAGAL KONEKSI KE TERMUX");
+                document.getElementById('mainBtn').style.display = 'block'; document.getElementById('pilihBtn').style.display = 'block'; document.getElementById('prog-wrapper').style.display = 'none';
+            }
         }
-    } catch (e) {
-        showAlert("GAGAL KONEKSI KE TERMUX");
-        // Balikin tombol kalau gagal
-        document.getElementById('mainBtn').style.display = 'block';
-        document.getElementById('pilihBtn').style.display = 'block';
-        document.getElementById('prog-wrapper').style.display = 'none';
-    }
-}
 
-
-        
+        // --- CHAT SYSTEM REAL-TIME ---
         async function sendMsg() {
             const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
             if(!inp.value.trim()) return;
@@ -238,5 +221,5 @@ async function handleProses() {
         }, 3000);
     </script>
 </body>
-    </html>
-        
+        </html>
+                                                                                   
