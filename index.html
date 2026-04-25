@@ -13,10 +13,14 @@
         .overlay-bg { position: fixed; inset: 0; background: radial-gradient(circle, transparent 20%, #000 130%); z-index: -1; }
         body { background: #000; color: #fff; font-family: 'Montserrat', sans-serif; width: 100%; height: 100vh; overflow: hidden; position: fixed; }
         
-        .master-wrapper { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10; }
+        .marquee-top { position: fixed; top: 0; left: 0; width: 100%; background: rgba(188, 19, 254, 0.1); backdrop-filter: blur(5px); border-bottom: 1px solid #bc13fe; padding: 5px 0; z-index: 999; }
+        .marquee-content { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; font-size: 10px; font-weight: 900; color: #bc13fe; text-transform: uppercase; letter-spacing: 2px; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .master-wrapper { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10; }
         .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #111; transition: 0.5s; cursor: pointer; }
         .upload-box { background: rgba(5, 5, 5, 0.6); border: 1px solid #111; padding: 25px; border-radius: 15px; width: 320px; backdrop-filter: blur(10px); }
-        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; display: block; width: 100%; text-decoration: none; text-align: center; }
+        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; display: block; text-decoration: none; text-align: center; }
 
         .online .logo-img { border-color: #bc13fe !important; box-shadow: 0 0 15px #bc13fe; }
         .online #mainBtn { background: #bc13fe !important; color: #fff !important; border: none; cursor: pointer; }
@@ -33,16 +37,17 @@
         .slide-handle { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; touch-action: none; cursor: grab; }
         .handle-bar { width: 40px; height: 5px; background: #333; border-radius: 10px; }
         #chatLogs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .msg { padding: 10px 14px; font-size: 12px; max-width: 85%; border-radius: 15px; line-height: 1.4; width: fit-content; }
+        .msg { padding: 10px 14px; font-size: 12px; max-width: 85%; border-radius: 15px; line-height: 1.4; width: fit-content; word-wrap: break-word; }
         .m-bot { align-self: flex-start; background: #111; color: #ccc; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
         .m-user { align-self: flex-end; background: #bc13fe; color: #fff; border-radius: 15px 15px 2px 15px; }
 
-        .wave-text span { display: inline-block; animation: wave 1.5s infinite; animation-delay: calc(.05s * var(--i)); }
-        @keyframes wave { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-5px); color: #bc13fe; } }
+        .wave-text span { display: inline-block; animation: wave-anim 1.5s infinite; animation-delay: calc(.05s * var(--i)); }
+        @keyframes wave-anim { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-5px); color: #bc13fe; } }
 
-        .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 12px 16px; background: #111; border-radius: 15px; border: 1px solid #222; margin-bottom: 5px; }
-        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite; }
-        .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+        .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 10px 14px; background: #111; border-radius: 15px; border: 1px solid #222; margin-bottom: 5px; }
+        .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
         #adminPop { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
@@ -50,11 +55,14 @@
         .pop-card input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 10px; outline: none; }
         
         footer { width: 100%; padding: 20px; text-align: center; position: fixed; bottom: 0; z-index: 10; }
-        .legal-item { font-size: 8px; color: #fff; text-transform: uppercase; font-weight: 700; opacity: 0.4; margin: 0 10px; }
-        #downloadBtn { display: none; background: #00ff88; color: #000; margin-top: 15px; border: none; }
+        .legal-item { font-size: 8px; color: #fff; text-transform: uppercase; font-weight: 700; opacity: 0.4; margin: 0 10px; cursor: pointer; }
     </style>
 </head>
 <body id="masterBody">
+
+    <div class="marquee-top">
+        <div class="marquee-content">WELCOME TO INO.DIGITAL HD • UPGRADE YOUR PHOTO QUALITY TO ULTRA HD NOW • BY INO.DIGITAL</div>
+    </div>
 
     <div class="video-bg"><video autoplay loop muted playsinline><source src="https://files.catbox.moe/o2crck.mp4" type="video/mp4"></video></div>
     <div class="overlay-bg"></div>
@@ -62,19 +70,23 @@
     <div class="master-wrapper">
         <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="logoIno">
         <h2 style="margin-top:15px; font-weight:900; letter-spacing: 2px;">INO.DIGITAL HD</h2>
-        <p style="font-size: 10px; color: #666; font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">AI Photo Restorer</p>
-
+        
         <div class="upload-box" style="margin-top:20px;">
-            <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
-            <input type="file" id="f" hidden onchange="window.hasPhoto=true; showAlert('FOTO SIAP!', '#00ff88');">
-            <button id="mainBtn" class="btn-base" onclick="handleProses()" style="margin-top:10px;">OFFLINE</button>
+            <div id="inputArea">
+                <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
+                <input type="file" id="f" hidden onchange="window.hasPhoto=true; showAlert('FOTO SIAP!', '#00ff88');">
+                <button id="mainBtn" class="btn-base" onclick="handleProses()" style="margin-top:10px;">OFFLINE</button>
+            </div>
+
+            <div id="hasilArea" style="display:none;">
+                <img id="fotoHasil" src="" style="width:100%; border-radius:10px; border:2px solid #bc13fe; box-shadow: 0 0 15px #bc13fe; margin-bottom:15px;">
+                <a id="downloadBtn" class="btn-base" href="#" download="InoDigital_HD.jpg" style="background:#00ff88; color:#000;">SIMPAN KE GALERY</a>
+            </div>
             
             <div id="prog-wrapper">
                 <div id="prog-cont"><div id="prog-bar"></div></div>
                 <div id="prog-perc">0%</div>
             </div>
-            
-            <a id="downloadBtn" class="btn-base" href="#">DOWNLOAD HD</a>
             <div id="alert-msg">NOTIFIKASI</div>
         </div>
     </div>
@@ -96,31 +108,56 @@
     <div id="drawer">
         <div class="slide-handle" id="dragArea"><div class="handle-bar"></div></div>
         <div id="chatLogs">
-            <div class="msg m-bot wave-text"><span style="--i:1">H</span><span style="--i:2">a</span><span style="--i:3">l</span><span style="--i:4">o</span>...</div>
+            <div class="msg m-bot wave-text" id="greetBox"></div>
             <div id="typIn" class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
         <div style="padding:15px; display:flex; gap:10px; background:#050505; padding-bottom:40px;">
-            <input type="text" id="msgIn" placeholder="Tulis..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px; border-radius:10px;">
+            <input type="text" id="msgIn" placeholder="Tulis..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px; border-radius:10px; outline:none;">
             <button onclick="sendMsg()" style="background:#bc13fe; border:none; color:#fff; width:45px; border-radius:10px;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <footer>
         <div style="color:#bc13fe; font-size:9px; font-weight:900; margin-bottom:8px;">© 2026 INO.DIGITAL</div>
-        <div><span class="legal-item">Privacy Policy</span><span class="legal-item">Usage Protocol</span></div>
+        <div>
+            <span class="legal-item" onclick="showAlert('PRIVACY POLICY ACTIVE', '#bc13fe')">Privacy Policy</span>
+            <span class="legal-item" onclick="showAlert('USAGE PROTOCOL ACTIVE', '#bc13fe')">Usage Protocol</span>
+        </div>
     </footer>
 
     <script>
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
-        let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set();
+        let isSystemOnline = false, lastUpd = 0;
 
-        // --- DRAWER ---
+        // --- GREETING FIX (Bantu? DI BAWAH) ---
+        function setWaveGreeting() {
+            const line1 = "Halo, 👋 Ada Yang Bisa Ino.Digital ";
+            const line2 = "Bantu?";
+            const box = document.getElementById('greetBox');
+            
+            const segmenter = new Intl.Segmenter('id', { granularity: 'grapheme' });
+            
+            // Proses baris 1
+            const chars1 = [...segmenter.segment(line1)].map(s => s.segment);
+            const html1 = chars1.map((char, i) => `<span style="--i:${i}">${char === " " ? "&nbsp;" : char}</span>`).join("");
+            
+            // Proses baris 2
+            const chars2 = [...segmenter.segment(line2)].map(s => s.segment);
+            const html2 = chars2.map((char, i) => `<span style="--i:${chars1.length + i}">${char === " " ? "&nbsp;" : char}</span>`).join("");
+            
+            // Gabungkan dengan <br> agar "Bantu?" di bawah
+            box.innerHTML = `${html1}<br>${html2}`;
+        }
+
         const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
-        let startY = 0, currentY = 0;
-        dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
-        dragArea.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; });
-        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
-        function toggleChat() { drawer.classList.toggle('open'); }
+        dragArea.ontouchstart = (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; };
+        dragArea.ontouchmove = (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; };
+        dragArea.ontouchend = () => { drawer.style.transition = 'transform 0.4s'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; };
+        
+        function toggleChat() { 
+            drawer.classList.toggle('open'); 
+            if(drawer.classList.contains('open')) setWaveGreeting();
+        }
 
         function showAlert(msg, color = "#ff3333") {
             const a = document.getElementById('alert-msg');
@@ -128,13 +165,13 @@
             setTimeout(() => a.style.display = 'none', 3000);
         }
 
-        // --- ADMIN ---
+        // --- ADMIN LOGIN ---
         let cl = 0;
         document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
         function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
         function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
 
-        // --- SATPAM ---
+        // --- PROSES HD ---
         async function cekStatus() {
             const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
             const link = localStorage.getItem('master_link');
@@ -146,65 +183,81 @@
         }
         setInterval(cekStatus, 5000); cekStatus();
 
-        // --- LOGIKA UTAMA: PROSES HD & POLLING HASIL ---
         async function handleProses() {
             if (!isSystemOnline) return showAlert("OFFLINE");
             if (!window.hasPhoto) return showAlert("PILIH FOTO!");
-
-            const fileInput = document.getElementById('f');
-            const formData = new FormData();
-            formData.append('foto', fileInput.files[0]);
-
-            document.getElementById('mainBtn').style.display = 'none';
-            document.getElementById('pilihBtn').style.display = 'none';
+            const formData = new FormData(); formData.append('foto', document.getElementById('f').files[0]);
+            document.getElementById('inputArea').style.display = 'none';
             document.getElementById('prog-wrapper').style.display = 'flex';
-            document.getElementById('downloadBtn').style.display = 'none';
-
-            let p = 0;
-            const iv = setInterval(() => { p++; if(p >= 90) p = 90; document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 100);
-
+            document.getElementById('hasilArea').style.display = 'none';
+            let p = 0; const iv = setInterval(() => { p++; if(p >= 95) p = 95; document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 200);
             try {
                 const link = localStorage.getItem('master_link').replace(/\/$/, "");
-                const response = await fetch(`${link}/upload`, { method: 'POST', body: formData });
-                
-                if(response.ok) {
-                    showAlert("SEDANG DI PROSES HD...", "#bc13fe");
-                    
-                    // POLLING: Cek tiap 5 detik apakah hasil_hd.jpg sudah ada
+                const resUpload = await fetch(`${link}/upload`, { method: 'POST', body: formData });
+                if(resUpload.ok) {
                     const cekHasil = setInterval(async () => {
+                        const urlHasil = `${link}/download/hasil_hd.jpg?t=${new Date().getTime()}`;
                         try {
-                            const res = await fetch(`${link}/download/hasil_hd.jpg`, { method: 'HEAD' });
-                            if(res.ok) {
-                                clearInterval(cekHasil);
-                                clearInterval(iv);
-                                document.getElementById('prog-bar').style.width = "100%";
-                                document.getElementById('prog-perc').innerText = "100%";
+                            const res = await fetch(urlHasil);
+                            const type = res.headers.get("Content-Type");
+                            if(res.ok && type && type.includes("image")) {
+                                clearInterval(cekHasil); clearInterval(iv);
+                                document.getElementById('prog-wrapper').style.display = 'none';
+                                document.getElementById('hasilArea').style.display = 'block';
+                                document.getElementById('fotoHasil').src = urlHasil;
+                                document.getElementById('downloadBtn').href = urlHasil;
                                 showAlert("HD SELESAI!", "#00ff88");
-                                
-                                // Tampilkan tombol download
-                                const dBtn = document.getElementById('downloadBtn');
-                                dBtn.href = `${link}/download/hasil_hd.jpg?t=${new Date().getTime()}`;
-                                dBtn.style.display = 'block';
                             }
                         } catch(e) {}
-                    }, 5000);
+                    }, 4000);
                 }
-            } catch (e) {
-                showAlert("GAGAL KONEKSI");
-                document.getElementById('mainBtn').style.display = 'block';
-                document.getElementById('pilihBtn').style.display = 'block';
-                document.getElementById('prog-wrapper').style.display = 'none';
-            }
+            } catch (e) { showAlert("GAGAL KONEKSI"); document.getElementById('inputArea').style.display = 'block'; document.getElementById('prog-wrapper').style.display = 'none'; }
         }
 
+        // --- CHAT LOGIC ---
         async function sendMsg() {
             const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs');
             if(!inp.value.trim()) return;
-            const t = inp.value;
-            const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = t;
+            const text = inp.value;
+            const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = text;
             logs.insertBefore(uM, document.getElementById('typIn')); inp.value = '';
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `💬 ${t}`}) });
+            logs.scrollTop = logs.scrollHeight;
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { 
+                method:'POST', headers:{'Content-Type':'application/json'}, 
+                body: JSON.stringify({chat_id:ADMIN_ID, text: `💬 User:\n${text}`}) 
+            });
+
+            document.getElementById('typIn').style.display = 'flex';
+
+            setTimeout(() => {
+                const sM = document.createElement('div'); sM.className = 'msg m-bot';
+                sM.innerText = "Pesan Terkirim, Admin Akan Segera Membalas";
+                logs.insertBefore(sM, document.getElementById('typIn'));
+                logs.scrollTop = logs.scrollHeight;
+            }, 1000);
         }
+
+        async function pollTelegram() {
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd + 1}`);
+                const data = await res.json();
+                if (data.result && data.result.length > 0) {
+                    for (let upd of data.result) {
+                        lastUpd = upd.update_id;
+                        if (upd.message && upd.message.chat.id == ADMIN_ID) {
+                            document.getElementById('typIn').style.display = 'none';
+                            const logs = document.getElementById('chatLogs');
+                            const bM = document.createElement('div'); bM.className = 'msg m-bot';
+                            bM.innerText = upd.message.text;
+                            logs.insertBefore(bM, document.getElementById('typIn'));
+                            logs.scrollTop = logs.scrollHeight;
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+        setInterval(pollTelegram, 3000);
     </script>
 </body>
 </html>
