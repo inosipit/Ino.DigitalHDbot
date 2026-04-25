@@ -16,20 +16,17 @@
         .master-wrapper { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 10; }
         .logo-img { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #111; transition: 0.5s; cursor: pointer; }
         .upload-box { background: rgba(5, 5, 5, 0.6); border: 1px solid #111; padding: 25px; border-radius: 15px; width: 320px; backdrop-filter: blur(10px); }
-        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; }
+        .btn-base { width: 100%; padding: 15px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-size: 11px; border: 1px solid #111; background: #080808; color: #333; transition: 0.3s; display: block; width: 100%; text-decoration: none; text-align: center; }
 
-        /* STATUS ONLINE NEON */
         .online .logo-img { border-color: #bc13fe !important; box-shadow: 0 0 15px #bc13fe; }
         .online #mainBtn { background: #bc13fe !important; color: #fff !important; border: none; cursor: pointer; }
 
-        /* PROGRESS BAR */
         #prog-wrapper { width: 100%; display: none; align-items: center; gap: 10px; margin-top: 15px; }
         #prog-cont { flex: 1; height: 14px; background: rgba(255,255,255,0.05); border: 1px solid #222; padding: 2px; border-radius: 4px; overflow: hidden; }
         #prog-bar { width: 0%; height: 100%; background: repeating-linear-gradient(90deg, #bc13fe, #bc13fe 4px, transparent 4px, transparent 6px); transition: 0.3s; }
         #prog-perc { font-size: 10px; font-weight: 900; color: #bc13fe; min-width: 35px; text-align: right; }
         #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* CHAT UI & DRAWER */
         #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); }
         #drawer { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); display: flex; flex-direction: column; }
         #drawer.open { transform: translateY(0); }
@@ -40,11 +37,9 @@
         .m-bot { align-self: flex-start; background: #111; color: #ccc; border-radius: 15px 15px 15px 2px; border: 1px solid #222; }
         .m-user { align-self: flex-end; background: #bc13fe; color: #fff; border-radius: 15px 15px 2px 15px; }
 
-        /* ANIMASI LAMBAI */
         .wave-text span { display: inline-block; animation: wave 1.5s infinite; animation-delay: calc(.05s * var(--i)); }
         @keyframes wave { 0%, 40%, 100% { transform: translateY(0); } 20% { transform: translateY(-5px); color: #bc13fe; } }
 
-        /* TYPING INDICATOR */
         .typing-bubble { align-self: flex-start; display: none; gap: 4px; padding: 12px 16px; background: #111; border-radius: 15px; border: 1px solid #222; margin-bottom: 5px; }
         .dot { width: 6px; height: 6px; background: #bc13fe; border-radius: 50%; animation: bounce 1.4s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
@@ -56,6 +51,7 @@
         
         footer { width: 100%; padding: 20px; text-align: center; position: fixed; bottom: 0; z-index: 10; }
         .legal-item { font-size: 8px; color: #fff; text-transform: uppercase; font-weight: 700; opacity: 0.4; margin: 0 10px; }
+        #downloadBtn { display: none; background: #00ff88; color: #000; margin-top: 15px; border: none; }
     </style>
 </head>
 <body id="masterBody">
@@ -66,10 +62,7 @@
     <div class="master-wrapper">
         <img src="https://files.catbox.moe/fmzx1o.png" class="logo-img" id="logoIno">
         <h2 style="margin-top:15px; font-weight:900; letter-spacing: 2px;">INO.DIGITAL HD</h2>
-        
-        <p style="font-size: 10px; color: #666; font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">
-            AI Restoration • Ultra Boost • No Quality Loss
-        </p>
+        <p style="font-size: 10px; color: #666; font-weight: 700; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">AI Photo Restorer</p>
 
         <div class="upload-box" style="margin-top:20px;">
             <button id="pilihBtn" class="btn-base" onclick="document.getElementById('f').click()" style="border-style:dashed; color:#555;">PILIH FOTO</button>
@@ -80,6 +73,8 @@
                 <div id="prog-cont"><div id="prog-bar"></div></div>
                 <div id="prog-perc">0%</div>
             </div>
+            
+            <a id="downloadBtn" class="btn-base" href="#">DOWNLOAD HD</a>
             <div id="alert-msg">NOTIFIKASI</div>
         </div>
     </div>
@@ -87,12 +82,12 @@
     <div id="adminPop">
         <div class="pop-card">
             <div id="pwStep">
-                <input type="password" id="adminPw" placeholder="PASSWORD ADMIN">
-                <button onclick="checkPw()" style="width:100%; padding:12px; background:#bc13fe; border:none; border-radius:10px; color:#fff; font-weight:900; margin-top:10px;">MASUK</button>
+                <input type="password" id="adminPw" placeholder="PASSWORD">
+                <button onclick="checkPw()" style="width:100%; padding:12px; background:#bc13fe; border:none; border-radius:10px; color:#fff; font-weight:900;">MASUK</button>
             </div>
             <div id="linkStep" style="display:none;">
-                <input type="text" id="newUrl" placeholder="PASTE LINK SERVEO/CF">
-                <button onclick="saveLink()" style="width:100%; padding:12px; background:#00ff88; border:none; border-radius:10px; color:#000; font-weight:900; margin-top:10px;">SIMPAN</button>
+                <input type="text" id="newUrl" placeholder="LINK SERVEO">
+                <button onclick="saveLink()" style="width:100%; padding:12px; background:#00ff88; border:none; border-radius:10px; color:#000; font-weight:900;">SIMPAN</button>
             </div>
         </div>
     </div>
@@ -101,68 +96,60 @@
     <div id="drawer">
         <div class="slide-handle" id="dragArea"><div class="handle-bar"></div></div>
         <div id="chatLogs">
-            <div class="msg m-bot wave-text">
-                <span style="--i:1">H</span><span style="--i:2">a</span><span style="--i:3">l</span><span style="--i:4">o</span>
-                <span style="--i:5">&nbsp;</span><span style="--i:6">A</span><span style="--i:7">d</span><span style="--i:8">a</span>
-                <span style="--i:9">&nbsp;</span><span style="--i:10">Y</span><span style="--i:11">a</span><span style="--i:12">n</span><span style="--i:13">g</span>
-                <span style="--i:14">&nbsp;</span><span style="--i:15">B</span><span style="--i:16">i</span><span style="--i:17">s</span><span style="--i:18">a</span>
-                <span style="--i:19">&nbsp;</span><span style="--i:20">A</span><span style="--i:21">d</span><span style="--i:22">m</span><span style="--i:23">i</span><span style="--i:24">n</span>
-                <span style="--i:25">&nbsp;</span><span style="--i:26">I</span><span style="--i:27">n</span><span style="--i:28">o</span><span style="--i:29">.</span><span style="--i:30">D</span><span style="--i:31">i</span><span style="--i:32">g</span><span style="--i:33">i</span><span style="--i:34">t</span><span style="--i:35">a</span><span style="--i:36">l</span>
-                <span style="--i:37">&nbsp;</span><span style="--i:38">B</span><span style="--i:39">a</span><span style="--i:40">n</span><span style="--i:41">t</span><span style="--i:42">u</span><span style="--i:43">?</span>
-            </div>
+            <div class="msg m-bot wave-text"><span style="--i:1">H</span><span style="--i:2">a</span><span style="--i:3">l</span><span style="--i:4">o</span>...</div>
             <div id="typIn" class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
         <div style="padding:15px; display:flex; gap:10px; background:#050505; padding-bottom:40px;">
-            <input type="text" id="msgIn" placeholder="Tulis kendala..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px; border-radius:10px; outline:none;">
+            <input type="text" id="msgIn" placeholder="Tulis..." style="flex:1; background:#111; border:1px solid #222; color:#fff; padding:12px; border-radius:10px;">
             <button onclick="sendMsg()" style="background:#bc13fe; border:none; color:#fff; width:45px; border-radius:10px;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <footer>
         <div style="color:#bc13fe; font-size:9px; font-weight:900; margin-bottom:8px;">© 2026 INO.DIGITAL</div>
-        <div><span class="legal-item">Secure Node</span><span class="legal-item">AI Restore</span></div>
+        <div><span class="legal-item">Privacy Policy</span><span class="legal-item">Usage Protocol</span></div>
     </footer>
 
     <script>
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
-        let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set(), sudahBalas = false;
+        let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set();
 
-        // --- LOGIKA SLIDE DRAWER ---
+        // --- DRAWER ---
         const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
         let startY = 0, currentY = 0;
         dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
         dragArea.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; });
-        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
-        function toggleChat() { drawer.classList.toggle('open'); drawer.style.transform = ''; }
+        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
+        function toggleChat() { drawer.classList.toggle('open'); }
 
         function showAlert(msg, color = "#ff3333") {
             const a = document.getElementById('alert-msg');
             a.innerText = msg; a.style.color = color; a.style.display = 'block';
-            setTimeout(() => { a.style.display = 'none'; }, 3000);
+            setTimeout(() => a.style.display = 'none', 3000);
         }
 
-        // --- ADMIN SYSTEM ---
+        // --- ADMIN ---
         let cl = 0;
         document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
         function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
         function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
 
-        // --- CEK STATUS REAL-TIME (SATPARAM) ---
+        // --- SATPAM ---
         async function cekStatus() {
             const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
             const link = localStorage.getItem('master_link');
-            if(!link) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
+            if(!link) return;
             try {
-                await fetch(`${link.replace(/\/$/, "")}/`, { mode: 'no-cors', headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: AbortSignal.timeout(4000) });
+                await fetch(`${link.replace(/\/$/, "")}/`, { mode: 'no-cors' });
                 isSystemOnline = true; body.classList.add('online'); btn.innerText = "PROSES HD";
             } catch(e) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; }
         }
         setInterval(cekStatus, 5000); cekStatus();
 
-        // --- PROSES UPLOAD KE OTOT TERMUX ---
+        // --- LOGIKA UTAMA: PROSES HD & POLLING HASIL ---
         async function handleProses() {
-            if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
-            if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
+            if (!isSystemOnline) return showAlert("OFFLINE");
+            if (!window.hasPhoto) return showAlert("PILIH FOTO!");
 
             const fileInput = document.getElementById('f');
             const formData = new FormData();
@@ -171,55 +158,53 @@
             document.getElementById('mainBtn').style.display = 'none';
             document.getElementById('pilihBtn').style.display = 'none';
             document.getElementById('prog-wrapper').style.display = 'flex';
+            document.getElementById('downloadBtn').style.display = 'none';
 
             let p = 0;
-            const iv = setInterval(() => { p++; if(p >= 90) { p = 90; clearInterval(iv); } document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 50);
+            const iv = setInterval(() => { p++; if(p >= 90) p = 90; document.getElementById('prog-bar').style.width = p + "%"; document.getElementById('prog-perc').innerText = p + "%"; }, 100);
 
             try {
-                const link = localStorage.getItem('master_link');
-                const response = await fetch(`${link.replace(/\/$/, "")}/upload`, { method: 'POST', body: formData });
+                const link = localStorage.getItem('master_link').replace(/\/$/, "");
+                const response = await fetch(`${link}/upload`, { method: 'POST', body: formData });
+                
                 if(response.ok) {
-                    document.getElementById('prog-bar').style.width = "100%"; document.getElementById('prog-perc').innerText = "100%";
-                    showAlert("BERHASIL TERKIRIM KE BOT!", "#00ff88");
-                } else { showAlert("GAGAL KIRIM KE TERMUX"); }
+                    showAlert("SEDANG DI PROSES HD...", "#bc13fe");
+                    
+                    // POLLING: Cek tiap 5 detik apakah hasil_hd.jpg sudah ada
+                    const cekHasil = setInterval(async () => {
+                        try {
+                            const res = await fetch(`${link}/download/hasil_hd.jpg`, { method: 'HEAD' });
+                            if(res.ok) {
+                                clearInterval(cekHasil);
+                                clearInterval(iv);
+                                document.getElementById('prog-bar').style.width = "100%";
+                                document.getElementById('prog-perc').innerText = "100%";
+                                showAlert("HD SELESAI!", "#00ff88");
+                                
+                                // Tampilkan tombol download
+                                const dBtn = document.getElementById('downloadBtn');
+                                dBtn.href = `${link}/download/hasil_hd.jpg?t=${new Date().getTime()}`;
+                                dBtn.style.display = 'block';
+                            }
+                        } catch(e) {}
+                    }, 5000);
+                }
             } catch (e) {
-                showAlert("GAGAL KONEKSI KE TERMUX");
-                document.getElementById('mainBtn').style.display = 'block'; document.getElementById('pilihBtn').style.display = 'block'; document.getElementById('prog-wrapper').style.display = 'none';
+                showAlert("GAGAL KONEKSI");
+                document.getElementById('mainBtn').style.display = 'block';
+                document.getElementById('pilihBtn').style.display = 'block';
+                document.getElementById('prog-wrapper').style.display = 'none';
             }
         }
 
-        // --- CHAT SYSTEM REAL-TIME ---
         async function sendMsg() {
-            const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
+            const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs');
             if(!inp.value.trim()) return;
             const t = inp.value;
             const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = t;
-            logs.insertBefore(uM, typ); inp.value = ''; logs.scrollTop = logs.scrollHeight;
-            if(!sudahBalas){ setTimeout(() => { const sM = document.createElement('div'); sM.className = 'msg m-bot'; sM.innerText = "Pesan terkirim ke admin."; logs.insertBefore(sM, typ); logs.scrollTop = logs.scrollHeight; sudahBalas = true; }, 500); }
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `🆔 USER\n💬 ${t}`}) });
+            logs.insertBefore(uM, document.getElementById('typIn')); inp.value = '';
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({chat_id:ADMIN_ID, text: `💬 ${t}`}) });
         }
-        
-        setInterval(async () => {
-            try {
-                const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpd+1}`);
-                const d = await r.json();
-                if(d.ok && d.result.length > 0) {
-                    const logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
-                    typ.style.display = 'flex'; logs.scrollTop = logs.scrollHeight;
-                    setTimeout(() => {
-                        d.result.forEach(u => {
-                            lastUpd = u.update_id; const msgId = u.message?.message_id;
-                            if(msgId && !processedMsgIds.has(msgId)) {
-                                processedMsgIds.add(msgId); typ.style.display = 'none';
-                                const bM = document.createElement('div'); bM.className = 'msg m-bot'; bM.innerText = u.message.text;
-                                logs.insertBefore(bM, typ); logs.scrollTop = logs.scrollHeight;
-                            }
-                        });
-                    }, 2000);
-                }
-            } catch(e){}
-        }, 3000);
     </script>
 </body>
-        </html>
-                                                                                   
+</html>
