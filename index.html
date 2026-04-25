@@ -31,7 +31,9 @@
         #prog-perc { font-size: 10px; font-weight: 900; color: #bc13fe; min-width: 35px; text-align: right; }
         #alert-msg { font-size: 9px; font-weight: 900; color: #ff3333; margin-top: 15px; display: none; text-transform: uppercase; letter-spacing: 1px; }
 
-        #csBtn { position: fixed; bottom: 120px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); }
+        /* FIX POSISI LOGO CS (LEBIH KE BAWAH) */
+        #csBtn { position: fixed; bottom: 30px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #bc13fe; color: #fff; display: flex; align-items: center; justify-content: center; z-index: 100; cursor: pointer; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); }
+        
         #drawer { position: fixed; bottom: 0; left: 0; width: 100%; height: 75vh; background: #080808; border-top: 2px solid #bc13fe; border-radius: 20px 20px 0 0; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); display: flex; flex-direction: column; }
         #drawer.open { transform: translateY(0); }
         .slide-handle { width: 100%; height: 40px; display: flex; justify-content: center; align-items: center; touch-action: none; cursor: grab; }
@@ -61,7 +63,7 @@
 <body id="masterBody">
 
     <div class="marquee-top">
-        <div class="marquee-content">WELCOME TO INO.DIGITAL HD • UPGRADE YOUR PHOTO QUALITY TO ULTRA HD NOW • BY INO.DIGITAL</div>
+        <div class="marquee-content">WELCOME TO INO.DIGITAL HD • UPGRADE YOUR PHOTO QUALITY TO ULTRA HD NOW </div>
     </div>
 
     <div class="video-bg"><video autoplay loop muted playsinline><source src="https://files.catbox.moe/o2crck.mp4" type="video/mp4"></video></div>
@@ -129,23 +131,15 @@
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
         let isSystemOnline = false, lastUpd = 0;
 
-        // --- GREETING FIX (Bantu? DI BAWAH) ---
         function setWaveGreeting() {
             const line1 = "Halo, 👋 Ada Yang Bisa Ino.Digital ";
             const line2 = "Bantu?";
             const box = document.getElementById('greetBox');
-            
             const segmenter = new Intl.Segmenter('id', { granularity: 'grapheme' });
-            
-            // Proses baris 1
             const chars1 = [...segmenter.segment(line1)].map(s => s.segment);
             const html1 = chars1.map((char, i) => `<span style="--i:${i}">${char === " " ? "&nbsp;" : char}</span>`).join("");
-            
-            // Proses baris 2
             const chars2 = [...segmenter.segment(line2)].map(s => s.segment);
             const html2 = chars2.map((char, i) => `<span style="--i:${chars1.length + i}">${char === " " ? "&nbsp;" : char}</span>`).join("");
-            
-            // Gabungkan dengan <br> agar "Bantu?" di bawah
             box.innerHTML = `${html1}<br>${html2}`;
         }
 
@@ -165,7 +159,7 @@
             setTimeout(() => a.style.display = 'none', 3000);
         }
 
-        // --- ADMIN LOGIN ---
+        // --- ADMIN ---
         let cl = 0;
         document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
         function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
@@ -222,14 +216,11 @@
             const uM = document.createElement('div'); uM.className = 'msg m-user'; uM.innerText = text;
             logs.insertBefore(uM, document.getElementById('typIn')); inp.value = '';
             logs.scrollTop = logs.scrollHeight;
-
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { 
                 method:'POST', headers:{'Content-Type':'application/json'}, 
                 body: JSON.stringify({chat_id:ADMIN_ID, text: `💬 User:\n${text}`}) 
             });
-
             document.getElementById('typIn').style.display = 'flex';
-
             setTimeout(() => {
                 const sM = document.createElement('div'); sM.className = 'msg m-bot';
                 sM.innerText = "Pesan Terkirim, Admin Akan Segera Membalas";
@@ -260,4 +251,5 @@
         setInterval(pollTelegram, 3000);
     </script>
 </body>
-</html>
+    </html>
+    
