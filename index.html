@@ -120,6 +120,40 @@
         let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set(), sudahBalas = false;
 
 
+        
+
+        // --- SLIDE DRAWER LOGIC ---
+        const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
+        let startY = 0, currentY = 0;
+        dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
+        dragArea.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; });
+        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
+        function toggleChat() { drawer.classList.toggle('open'); drawer.style.transform = ''; }
+
+        function showAlert(msg, color = "#ff3333") {
+            const a = document.getElementById('alert-msg');
+            a.innerText = msg; a.style.color = color; a.style.display = 'block';
+            setTimeout(() => { a.style.display = 'none'; }, 3000);
+        }
+
+        let cl = 0;
+        document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
+        function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
+        function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
+
+        async function cekStatus() {
+            const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
+            const link = localStorage.getItem('master_link');
+            if(!link) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
+            try {
+                await fetch(`${link.replace(/\/$/, "")}/`, { mode: 'no-cors', headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: AbortSignal.timeout(4000) });
+                isSystemOnline = true; body.classList.add('online'); btn.innerText = "PROSES HD";
+            } catch(e) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; }
+        }
+        setInterval(cekStatus, 5000); cekStatus();
+
+
+        
         // --- CARI DAN GANTI FUNGSI INI DI DALAM INDEX.HTML ---
 async function handleProses() {
     if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
@@ -170,46 +204,8 @@ async function handleProses() {
     }
 }
 
-        // --- SLIDE DRAWER LOGIC ---
-        const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
-        let startY = 0, currentY = 0;
-        dragArea.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; drawer.style.transition = 'none'; });
-        dragArea.addEventListener('touchmove', (e) => { currentY = e.touches[0].clientY - startY; if (currentY > 0) drawer.style.transform = `translateY(${currentY}px)`; });
-        dragArea.addEventListener('touchend', () => { drawer.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)'; if (currentY > 150) drawer.classList.remove('open'); drawer.style.transform = ''; currentY = 0; });
-        function toggleChat() { drawer.classList.toggle('open'); drawer.style.transform = ''; }
 
-        function showAlert(msg, color = "#ff3333") {
-            const a = document.getElementById('alert-msg');
-            a.innerText = msg; a.style.color = color; a.style.display = 'block';
-            setTimeout(() => { a.style.display = 'none'; }, 3000);
-        }
-
-        let cl = 0;
-        document.getElementById('logoIno').onclick = () => { cl++; if(cl>=10) document.getElementById('adminPop').style.display='flex'; setTimeout(()=>cl=0,3000); };
-        function checkPw() { if(document.getElementById('adminPw').value === "ino.digital") { document.getElementById('pwStep').style.display='none'; document.getElementById('linkStep').style.display='block'; } }
-        function saveLink() { let l = document.getElementById('newUrl').value.trim(); if(l){ if(!l.startsWith('http')) l='https://'+l; localStorage.setItem('master_link', l); location.reload(); } }
-
-        async function cekStatus() {
-            const body = document.getElementById('masterBody'), btn = document.getElementById('mainBtn');
-            const link = localStorage.getItem('master_link');
-            if(!link) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; return; }
-            try {
-                await fetch(`${link.replace(/\/$/, "")}/`, { mode: 'no-cors', headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: AbortSignal.timeout(4000) });
-                isSystemOnline = true; body.classList.add('online'); btn.innerText = "PROSES HD";
-            } catch(e) { isSystemOnline = false; body.classList.remove('online'); btn.innerText = "OFFLINE"; }
-        }
-        setInterval(cekStatus, 5000); cekStatus();
-
-        function handleProses() {
-            if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
-            if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
-            document.getElementById('mainBtn').style.display = 'none';
-            document.getElementById('pilihBtn').style.display = 'none';
-            document.getElementById('prog-wrapper').style.display = 'flex';
-            let p = 0;
-            const iv = setInterval(() => { p++; if(p>=95){ p=95; clearInterval(iv); showAlert("MENUNGGU RESPON...", "#bc13fe"); } document.getElementById('prog-bar').style.width = p+"%"; document.getElementById('prog-perc').innerText = p+"%"; }, 200);
-        }
-
+        
         async function sendMsg() {
             const inp = document.getElementById('msgIn'), logs = document.getElementById('chatLogs'), typ = document.getElementById('typIn');
             if(!inp.value.trim()) return;
