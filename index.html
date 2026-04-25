@@ -119,6 +119,57 @@
         const BOT_TOKEN = "8598427112:AAFLT7lgdu7fzxbgr-Jhr6rSfCjI7hEJM2c", ADMIN_ID = "8379816457";
         let isSystemOnline = false, lastUpd = 0, processedMsgIds = new Set(), sudahBalas = false;
 
+
+        // --- CARI DAN GANTI FUNGSI INI DI DALAM INDEX.HTML ---
+async function handleProses() {
+    if (!isSystemOnline) return showAlert("LINK BLOM DI SET ADMIN");
+    if (!window.hasPhoto) return showAlert("PILIH FOTONYA TERLEBIH DAHULU");
+
+    // Ambil file foto dari input
+    const fileInput = document.getElementById('f');
+    const formData = new FormData();
+    formData.append('foto', fileInput.files[0]);
+
+    // Tampilan animasi progress dimulai
+    document.getElementById('mainBtn').style.display = 'none';
+    document.getElementById('pilihBtn').style.display = 'none';
+    document.getElementById('prog-wrapper').style.display = 'flex';
+    
+    let p = 0;
+    const iv = setInterval(() => { 
+        p++; 
+        if(p >= 90) { p = 90; clearInterval(iv); } // Nahan di 90% pas upload
+        document.getElementById('prog-bar').style.width = p + "%";
+        document.getElementById('prog-perc').innerText = p + "%";
+    }, 50);
+
+    try {
+        const link = localStorage.getItem('master_link');
+        // Nembak ke jalur /upload di script Python Termux
+        const response = await fetch(`${link.replace(/\/$/, "")}/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const hasil = await response.json();
+        
+        if(response.ok) {
+            // Kalau sukses, bar jadi 100%
+            document.getElementById('prog-bar').style.width = "100%";
+            document.getElementById('prog-perc').innerText = "100%";
+            showAlert("BERHASIL TERKIRIM KE BOT!", "#00ff88");
+        } else {
+            showAlert("GAGAL: " + hasil.pesan);
+        }
+    } catch (e) {
+        showAlert("GAGAL KONEKSI KE TERMUX");
+        // Balikin tombol kalau gagal
+        document.getElementById('mainBtn').style.display = 'block';
+        document.getElementById('pilihBtn').style.display = 'block';
+        document.getElementById('prog-wrapper').style.display = 'none';
+    }
+}
+
         // --- SLIDE DRAWER LOGIC ---
         const drawer = document.getElementById('drawer'), dragArea = document.getElementById('dragArea');
         let startY = 0, currentY = 0;
